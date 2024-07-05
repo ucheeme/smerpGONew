@@ -1,0 +1,34 @@
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
+
+var kViewOrderColor = Color(0xFFFCFAFF);
+var kAppBlue =Color(0xFF695ACD);
+var kAppBlueSplash =Color(0xFF695ACD);
+var kLightPink = Color(0xFFF9F5FF);
+var kLightPink1 = Color(0xFFebe7f7);
+var kLightPink2 = Color(0xFFF5F3FB);
+var kLightPinkPin = Color(0xFFF0EDF9);
+var kCalendarLightPink = Color(0xFCFAFF);
+var kInactiveLightPinkSwitch = Color(0xFFEDE9F8);
+var kInactiveLightPinkSwitchBu = Color(0xFFCCC4EC);
+var kWhite50 = Color(0xFFFCFCFC);
+var kSalesListColor = Color(0xFAFAFA);
+var kRed50 = Color(0xFFFFEBEE);
+var kRed60 = Color(0xFFE53935);
+var kRed70 = Color(0xFFD32F2F);
+var kGreen70 = Color(0xFF388E3C);
+var kHashBlack50 = Color(0xFF7B7B7B);
+var kHashBlack30 = Color(0xFFC4C4C4);
+var kDashboardColorBorder = Color(0xFFF9F8FD);
+var kDashboardColorBlack3 = Color(0xFFFAFAFA);
+var kWhite = Colors.white;
+var kWhite2 = Color(0xFFF9F8FD);
+var kBlack = Colors.black;
+var kBlackB800 = Color(0xFF262626);
+var kBlackB600 = Color(0xFF555555);
+var kBlackB500 = Color(0x7B7B7B);
+var kBlackB700 = Color(0xFF434343);
+var kPaidColor = Color(0xFFE8F5E9);
+var kUnpaidColor = Color(0xFFFFEBEE);
+var kPendingColor = Color(0xFFF5F3FB);
