@@ -60,7 +60,7 @@ String updateMsg = "There is a new update available";
 PackageInfo? packageInfo;
 var sessionExpired = false;
 var requireUpdate = false;
-const isProduction = false;
+const isProduction = true;
 var remoteConfig;
 
 Future<void> initializeDefaultFromAndroidResource() async {

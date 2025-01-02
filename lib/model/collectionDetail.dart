@@ -49,7 +49,7 @@ class Product {
 
   factory Product.fromJson(Map<String, dynamic> json) => Product(
     id: json["id"],
-    productImage: json["productImage"],
+    productImage: json["productImage"]??"",
     productName: json["productName"],
     productCategory: json["productCategory"],
     productUnitCategory: json["productUnitCategory"],

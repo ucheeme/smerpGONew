@@ -31,7 +31,7 @@ class SharedPref {
 
   static save(String key, value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString(key, json.encode(value));
+    prefs.setString(key, json.encode(value)??"");
   }
 
   static saveBool(String key, value) async {
