@@ -108,7 +108,7 @@ class _DownloadFornmatState extends State<DownloadFornmat> {
         final directory = await getApplicationDocumentsDirectory();
         final imagePath = await File('${directory.path}/image.png').create();
         await imagePath.writeAsBytes(image);
-        await Share.shareFiles([imagePath.path]);
+        await Share.shareXFiles([imagePath as XFile]);
       }
 
   }
@@ -147,5 +147,5 @@ Future getPdf(String fileName,Uint8List screenShot) async {
   File pdfFile = await File('$path/$fileName.pdf').create();
 
   pdfFile.writeAsBytesSync(await pdf.save());
-  await Share.shareFiles([pdfFile.path]);
+  await Share.shareXFiles([pdfFile as XFile]);
 }

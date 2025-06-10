@@ -125,7 +125,8 @@ class ApiService{
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Authorization': 'Bearer ${isAdmin ? clientAccessToken : userAccessToken}',
-      } : {
+      } :
+      {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       };
@@ -182,6 +183,9 @@ class ApiService{
       }
       if (ApiResponseCodes.forbidden== response.statusCode){
         return ForbiddenAccess(response.statusCode, response.body);
+      }
+      if(response.statusCode == 400||response.statusCode==404){
+        return  Failure(response.statusCode, response.body);
       }
       else{
         return  Failure(response.statusCode,"Error Occurred");

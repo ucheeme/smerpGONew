@@ -70,7 +70,7 @@ class _DownloadReportStepTwoDesignState extends State<DownloadReportStepTwoDesig
         Future.delayed(Duration.zero, () {
           FirebaseAnalytics.instance.logEvent(
             name: trackedPagesAndActions[4],
-            parameters: <String, dynamic>{
+            parameters: <String, Object>{
               'string_parameter': 'Report Downloaded',
               'int_parameter': 4,
             },

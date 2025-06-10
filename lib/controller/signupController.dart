@@ -213,7 +213,7 @@ class SignUpController extends GetxController{
             SharedPref.save("userPin", signUpConfirmPinSetUp.text);
             FirebaseAnalytics.instance.logEvent(
               name: trackedPagesAndActions[1],
-              parameters: <String, dynamic>{
+              parameters: <String, Object>{
                 'string_parameter': 'Successfully Create Account',
                 'int_parameter': 1,
               },

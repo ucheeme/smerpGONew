@@ -10,12 +10,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_image_saver/flutter_image_saver.dart';
+// import 'package:flutter_image_saver/flutter_image_saver.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 // import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+// import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -558,7 +558,7 @@ class _ReceiptInAppState extends State<ReceiptInApp> {
       String? deliveryAddress}  ) async {
     FirebaseAnalytics.instance.logEvent(
       name: trackedPagesAndActions[6],
-      parameters: <String, dynamic>{
+      parameters: <String, Object>{
         'string_parameter': 'Print receipt',
         'int_parameter': 6,
       },
@@ -633,7 +633,7 @@ class _ReceiptInAppState extends State<ReceiptInApp> {
   void callScreenShotWidget(String customerName, bool isOrder) {
        FirebaseAnalytics.instance.logEvent(
       name: trackedPagesAndActions[5],
-      parameters: <String, dynamic>{
+      parameters: <String, Object>{
         'string_parameter': 'Share receipt',
         'int_parameter': 5,
       },
@@ -663,7 +663,7 @@ class _ReceiptInAppState extends State<ReceiptInApp> {
         final imagePath = await File('${directory.path}/image.png').create();
         await imagePath.writeAsBytes(value);
         /// Share Plugin
-        await Share.shareFiles([imagePath.path]);
+        await Share.shareXFiles([imagePath as XFile]);
       }
     });
     checkAndRequestPermission();

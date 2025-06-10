@@ -31,7 +31,7 @@ class _SignupState extends State<Signup> {
   void initState() {
     FirebaseAnalytics.instance.logEvent(
       name: trackedPagesAndActions[0],
-      parameters: <String, dynamic>{
+      parameters: <String, Object>{
         'string_parameter': 'Entered SignUp page',
         'int_parameter': 0,
       },

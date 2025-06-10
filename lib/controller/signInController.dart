@@ -71,7 +71,7 @@ Future<bool> loginUser(String? id, String pin,{context}) async{
 print(id);
 
   Login? login;
-print("il");
+
   login = Login(username: id!, pin: pin);
   var response = await ApiService.makeApiCall2(login, AppUrls().loginUser,
   isAdmin: false, requireAccess: false);
@@ -164,7 +164,7 @@ return true;
         Get.snackbar("SignIn Failed",
           data.message,
           backgroundColor: Colors.red.withOpacity(0.5),
-          colorText: Colors.white,);
+          colorText: Colors.black,);
        // return false;
       }
     }catch(e, trace){

@@ -77,7 +77,7 @@ class Assets {
   static const String assetsPaid = 'assets/paid.png';
   static const String assetsPaymentImg = 'assets/paymentImg.png';
   static const String assetsPending = 'assets/pending.png';
-  static const String assetsPerson.jpg = 'assets/person.jpg.avif';
+  static const String assetsPerson= 'assets/person.jpg.avif';
   static const String assetsPinSet = 'assets/pinSet.png';
   static const String assetsPngTransparentViberWhatsappSkypeSkypePurpleVioletText = 'assets/png-transparent-viber-whatsapp-skype-skype-purple-violet-text.png';
   static const String assetsPrinter = 'assets/printer.svg';
@@ -100,7 +100,7 @@ class Assets {
   static const String assetsSecondSlide = 'assets/secondSlide.png';
   static const String assetsSecurityUser = 'assets/securityUser.png';
   static const String assetsShare = 'assets/share.svg';
-  static const String assetsShare copy = 'assets/share copy.svg';
+  static const String assetsSharecopy = 'assets/share copy.svg';
   static const String assetsShareCopy = 'assets/shareCopy.svg';
   static const String assetsSmerpBgAnimation = 'assets/smerpBgAnimation.gif';
   static const String assetsSmerpDev = 'assets/smerp_dev.png';

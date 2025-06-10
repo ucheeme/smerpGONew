@@ -72,7 +72,7 @@ class _AddNewSaleState extends State<AddNewSale> {
     _controller.createSalesItem.clear();
     FirebaseAnalytics.instance.logEvent(
       name: "Make Sale Page",
-      parameters: <String, dynamic>{
+      parameters: <String, Object>{
         'string_parameter': 'Opened Sale Page',
         'int_parameter': 8,
      },
@@ -492,7 +492,7 @@ class _AddNewSaleState extends State<AddNewSale> {
             clearSale();
             FirebaseAnalytics.instance.logEvent(
               name: trackedPagesAndActions[2],
-              parameters: <String, dynamic>{
+              parameters: <String, Object>{
                 'string_parameter': 'Sale Completed',
                 'int_parameter': 3,
               },
