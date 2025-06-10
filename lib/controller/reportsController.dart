@@ -119,7 +119,7 @@ class ReportsControler extends GetxController{
     File pdfFile = await File('$path/$fileName.pdf').create();
 
     pdfFile.writeAsBytesSync(await pdf.save());
-     await Share.shareFiles([pdfFile.path]);
+     await Share.shareXFiles([pdfFile as XFile]);
   }
 
   Future<List<SaleReportData>> saleReportByMonth(int month,{isRefresh=

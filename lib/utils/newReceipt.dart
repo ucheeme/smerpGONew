@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+// import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
@@ -442,7 +442,7 @@ class _SmerpGoReceiptState extends State<SmerpGoReceipt> {
       final imagePath = await File('${directory.path}/image.png').create();
       await imagePath.writeAsBytes(image);
       Fluttertoast.showToast(msg: "Receipt downloaded successfully at ${imagePath.path}");
-      await Share.shareFiles([imagePath.path]);
+      await Share.shareXFiles([imagePath as XFile]);
     }
 
   }

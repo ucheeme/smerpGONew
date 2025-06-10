@@ -11,7 +11,7 @@ class NetworkStatusService extends GetxService {
   NetworkStatusService() {
     Connectivity().onConnectivityChanged.listen(
           (status) async {
-        _getNetworkStatus(status);
+        _getNetworkStatus(status as ConnectivityResult);
       }, );
   }
   void _getNetworkStatus(ConnectivityResult status) {

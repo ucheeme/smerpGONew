@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 // import 'package:device_imei/device_imei.dart';
-import 'package:device_imei/device_imei.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 // import 'package:device_information/device_information.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -20,7 +19,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 // import 'package:mobile_device_identifier/mobile_device_identifier.dart';
-import 'package:ots/ots.dart';
+// import 'package:ots/ots.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:smerp_go/Reposistory/catalogRepo.dart';
@@ -178,7 +177,6 @@ class _MyApp extends State<MyApp> {
   // final _deviceImeiPlugin = DeviceImei();
   bool getPermission = false;
   String message = "Please allow permission request!";
-  DeviceInfo? deviceInfo;
   @override
   void initState() {
     FirebaseMessaging.instance.getToken().then((devToken) {
@@ -232,8 +230,7 @@ class _MyApp extends State<MyApp> {
         minTextAdapt: true,
         // ensureScreenSize: true,
         builder: (BuildContext context, Widget? child) {
-          return OTS(
-            child: GetMaterialApp(
+          return  GetMaterialApp(
                 title: 'Smerpgo',
                 initialRoute: '/',
                 getPages: [GetPage(name: '/', page: () =>
@@ -241,8 +238,7 @@ class _MyApp extends State<MyApp> {
                 debugShowCheckedModeBanner: false,
              //  theme: Get.theme
 
-            ),
-          );
+            );
         },
 
       ),

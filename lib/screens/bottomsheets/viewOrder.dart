@@ -835,7 +835,7 @@ class _ViewOrderState extends State<ViewOrder> {
         setState(() {
           isLoading.value= false;
         });
-        await Share.shareFiles([imagePath.path]);
+        await Share.shareXFiles([imagePath as XFile]);
       }
     });
     checkAndRequestPermission();
