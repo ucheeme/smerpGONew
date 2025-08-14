@@ -377,8 +377,6 @@ Future<void> newFeatureAvailable()async {
                                                   .cupertino,
                                             );
                                           },
-
-
                                           child: customText1("Show all Sales",
                                               kBlackB600, 16.sp,
                                               fontWeight: FontWeight.w400),
