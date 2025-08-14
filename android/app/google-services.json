@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "651699494096",
-    "project_id": "smerpgo-45ea8",
-    "storage_bucket": "smerpgo-45ea8.appspot.com"
+    "project_number": "757883195718",
+    "project_id": "smerpgo-47b95",
+    "storage_bucket": "smerpgo-47b95.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:651699494096:android:ea84874a1cf5dc0bbd12d5",
+        "mobilesdk_app_id": "1:757883195718:android:0b20e912eb6e356cff1547",
         "android_client_info": {
           "package_name": "com.fifthlab.smerp_go"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA2bGZKwb7Fa1aQx58GTsZUbdP5TYp1jpY"
+          "current_key": "AIzaSyC_-fH0akQTVtlntO7XJwWVfQL60RVHPhs"
         }
       ],
       "services": {

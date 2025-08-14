@@ -50,19 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyA2bGZKwb7Fa1aQx58GTsZUbdP5TYp1jpY',
-    appId: '1:651699494096:android:ea84874a1cf5dc0bbd12d5',
-    messagingSenderId: '651699494096',
-    projectId: 'smerpgo-45ea8',
-    storageBucket: 'smerpgo-45ea8.appspot.com',
+    apiKey: 'AIzaSyC_-fH0akQTVtlntO7XJwWVfQL60RVHPhs',
+    appId: '1:757883195718:android:0b20e912eb6e356cff1547',
+    messagingSenderId: '757883195718',
+    projectId: 'smerpgo-47b95',
+    storageBucket: 'smerpgo-47b95.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyB6gJ92TSalk1_TbE0OtE-7gvVh11xcCcA',
-    appId: '1:651699494096:ios:3bff85427e75e73abd12d5',
-    messagingSenderId: '651699494096',
-    projectId: 'smerpgo-45ea8',
-    storageBucket: 'smerpgo-45ea8.appspot.com',
+    apiKey: 'AIzaSyCKF8QObYvkJH_Z4JvQWro2HgQUcpKqnX8',
+    appId: '1:757883195718:ios:de204795409e7a37ff1547',
+    messagingSenderId: '757883195718',
+    projectId: 'smerpgo-47b95',
+    storageBucket: 'smerpgo-47b95.firebasestorage.app',
     iosBundleId: 'com.fifthlab.smerpGo',
   );
+
 }

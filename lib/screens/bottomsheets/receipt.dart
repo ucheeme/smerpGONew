@@ -73,7 +73,7 @@ class _ReceiptInAppState extends State<ReceiptInApp> {
    Uint8List image =Uint8List(0);
  // XFile file = XFile();
   final doc = pw.Document();
-
+  bool isProcessingReceipt = false;
   RxBool isLoading = false.obs;
   List<SaleListDataInfo> saleListInfo = [SaleListDataInfo(salesId: 0, customerName: '', saleProducts: [])];
   ScreenshotController _screenshotController = ScreenshotController();
@@ -281,14 +281,17 @@ class _ReceiptInAppState extends State<ReceiptInApp> {
                           )
                         ])),
                     gapHeight(40.h),
+                  isProcessingReceipt?CircularProgressIndicator():
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
 
                       children: [
                         GestureDetector(
                           onTap: () async {
-                              generateAndDownloadAsImage(customersName,paymentStatusId,
-                              widget.isOrder);
+                            setState(() {
+                              isProcessingReceipt=true;
+                            });
+                              generateAndDownloadAsImage(customersName,paymentStatusId, widget.isOrder);
                               },
                           child: Column(
                             children: [
@@ -332,6 +335,9 @@ class _ReceiptInAppState extends State<ReceiptInApp> {
                         // ),
                         GestureDetector(
                           onTap: (){
+                            setState(() {
+                              isProcessingReceipt=true;
+                            });
                             generatePdf(
                               (widget.isOrder)?[]:saleListInfo,
                               (widget.isOrder)?orderInformation!.items:[],
@@ -478,13 +484,14 @@ class _ReceiptInAppState extends State<ReceiptInApp> {
                     ])),
                 gapHeight(40.h),
                 Container(
-                  child: Row(
+                  child:isProcessingReceipt?CircularProgressIndicator(): Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
 
                     children: [
                       GestureDetector(
                         onTap: () async {
-                            generateAndDownloadAsImage(customersName,paymentStatusId,widget.isOrder);
+
+                           generateAndDownloadAsImage(customersName,paymentStatusId,widget.isOrder);
 
                          // Get.to(CustomerReceipt(saleListInfo: saleListInfo));
                          // Uint8List res=await   getCustomerReceipt();
@@ -514,8 +521,9 @@ class _ReceiptInAppState extends State<ReceiptInApp> {
 
                       GestureDetector(
                           onTap: (){
-                            // printWidget(SmerpGoReceipt(saleListInfo: saleListInfo,
-                            // isOrder: false,items: [],), PdfPageFormat.a4);
+                            setState(() {
+                              isProcessingReceipt=true;
+                            });
                             generatePdf(saleListInfo, [],
                               paymentStatus: (widget.isOrder)?orderInformation!.paymentStatus:
                               _controller.paymentStatus.value,);
@@ -571,6 +579,10 @@ class _ReceiptInAppState extends State<ReceiptInApp> {
     orderData: orderData,customerName: customerName,orderPlacedAt: orderPlacedAt,
     deliveryAddress: deliveryAddress, isOrder: isOrder,orderCompletedAt: orderCompletedAt,
      paymentStatus: paymentStatus));
+
+    setState(() {
+      isProcessingReceipt=false;
+    });
   }
 
 
@@ -598,7 +610,11 @@ class _ReceiptInAppState extends State<ReceiptInApp> {
           :saleListInfo[0].customerName,);// Delay for 2 seconds
   }
   Future<void> generateAndDownloadAsImage(String customerName,int? paymentStatus,
-      bool isOrder) async {
+      bool isOrder)
+  async {
+    setState(() {
+      isProcessingReceipt=true;
+    });
   List<OrderItems> items=(widget.isOrder)?orderInformation!.items:[];
        if(widget.isOrder){
   if(items.length.isGreaterThan(6)){
@@ -617,6 +633,7 @@ class _ReceiptInAppState extends State<ReceiptInApp> {
     }
 
   void callPrintPdf(context) {
+
     final snackBar = SnackBar(
       content: Text('Image file cant allow more than 6 product item.'
           ' System generating pdf file to allow all items'),
@@ -627,6 +644,7 @@ class _ReceiptInAppState extends State<ReceiptInApp> {
           "System generating pdf file to allow all items",
       snackPosition: SnackPosition.BOTTOM,
     );
+
     delay();
   }
 
@@ -638,7 +656,7 @@ class _ReceiptInAppState extends State<ReceiptInApp> {
         'int_parameter': 5,
       },
     );
-    print(customerName);
+
     _screenshotController.captureFromWidget(
 
         InheritedTheme.captureAll(context,
@@ -663,9 +681,15 @@ class _ReceiptInAppState extends State<ReceiptInApp> {
         final imagePath = await File('${directory.path}/image.png').create();
         await imagePath.writeAsBytes(value);
         /// Share Plugin
-        await Share.shareXFiles([imagePath as XFile]);
+        await Share.shareXFiles([XFile(imagePath.path)]);
       }
+      setState(() {
+        isProcessingReceipt=false;
+      });
     });
+       setState(() {
+         isProcessingReceipt=false;
+       });
     checkAndRequestPermission();
   }
 

@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyB6gJ92TSalk1_TbE0OtE-7gvVh11xcCcA</string>
+	<string>AIzaSyCKF8QObYvkJH_Z4JvQWro2HgQUcpKqnX8</string>
 	<key>GCM_SENDER_ID</key>
-	<string>651699494096</string>
+	<string>757883195718</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.fifthlab.smerpGo</string>
 	<key>PROJECT_ID</key>
-	<string>smerpgo-45ea8</string>
+	<string>smerpgo-47b95</string>
 	<key>STORAGE_BUCKET</key>
-	<string>smerpgo-45ea8.appspot.com</string>
+	<string>smerpgo-47b95.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:651699494096:ios:3bff85427e75e73abd12d5</string>
+	<string>1:757883195718:ios:de204795409e7a37ff1547</string>
 </dict>
 </plist>

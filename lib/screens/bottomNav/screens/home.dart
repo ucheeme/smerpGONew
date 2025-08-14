@@ -367,9 +367,20 @@ Future<void> newFeatureAvailable()async {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        customText1("Showing all Sales records",
-                                            kBlackB600, 16.sp,
-                                            fontWeight: FontWeight.w400),
+                                        GestureDetector(
+                                          onTap: () {
+                                            Get.to(
+                                              Sales(),
+                                              duration: Duration(
+                                                  seconds: 1),
+                                              transition: Transition
+                                                  .cupertino,
+                                            );
+                                          },
+                                          child: customText1("Show all Sales",
+                                              kBlackB600, 16.sp,
+                                              fontWeight: FontWeight.w400),
+                                        ),
                                         GestureDetector(
                                           onTap: () async {
                                             Get.bottomSheet(
