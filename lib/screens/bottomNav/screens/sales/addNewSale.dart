@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
 import 'package:smerp_go/controller/addSaleController.dart';
 import 'package:smerp_go/model/request/createSale.dart';
 import 'package:smerp_go/screens/bottomsheets/paymentStatus.dart';
@@ -499,7 +500,7 @@ class _AddNewSaleState extends State<AddNewSale> {
             );
             // Navigator.pop(context);
             SalesDatum createdSale = saleListTemp[0];
-            print("I am ncus: $customerNAME");
+            AppLogger.debug('Sale created, showing receipt', tag: 'Sale');
             showCupertinoModalBottomSheet(
                 backgroundColor: kWhite,
                 context: context,
@@ -527,15 +528,13 @@ class _AddNewSaleState extends State<AddNewSale> {
                 isCreatedSale.value = true;
                 saleListTemp = await _controllerD.allSaleList();
                 clearSale();
-                print("this is the new sale: ${saleListTemp.first.customerName}");
+                AppLogger.debug('Sale created, showing receipt', tag: 'Sale');
                 // Navigator.pop(context);
                 SalesDatum createdSale = saleListTemp[0];
-               print("I am ncus: $customerNAME");
                 showCupertinoModalBottomSheet(
                     backgroundColor: kWhite,
                     context: context,
                     builder: (context) {
-                      print("I am ncusdsds: $customerNAME");
                       return Container(
                           height: (createdSale.itemCount == 1) ?
                           500.h : _controllerD.getReceiptHeight(
@@ -615,7 +614,7 @@ class _AddNewSaleState extends State<AddNewSale> {
   void deleteItem(int index) {
 
     if(_controller.prAddList.length>_controller.qtyList.length){
-      print("initial");
+      AppLogger.debug('Deleting sale line item index=$index', tag: 'Sale');
      setState(() {
        _controller.prAddList.removeAt(index);
        _controller.prodName = "Select product";
@@ -667,31 +666,30 @@ class _AddNewSaleState extends State<AddNewSale> {
           //  _controller.tempQty=0;
           _controller.isDone.value = false;
         });
-        print("the create sale item is ${_controller.createSalesItem
-            .length} and the prAddList is ${_controller.prAddList.length}");
+        AppLogger.debug(
+          'addMoreProduct createItems=${_controller.createSalesItem.length} prAddList=${_controller.prAddList.length}',
+          tag: 'Sale',
+        );
         InventoryInfo response = await Get.bottomSheet(
             AllProduct()
         );
-        print("this is the response id :${response.id}");
+        AppLogger.debug('Product selected id=${response.id}', tag: 'Sale');
         if (response != null) {
           int index = 0;
           for (var element in _controller.prAddList) {
             index++;
-            print("this is element ${element.data.id}");
-            print("this is selected product ${response.id}");
             if (element.data.id == response.id) {
 
               isExistingSale.value = true;
-              print("I am now $isExistingSale");
+              AppLogger.debug('Existing product in sale list', tag: 'Sale');
               await updateItemAction(index - 1,false);
               _controller.isDone.value=true;
               return;
             }
             else {
-              print("This is where I am");
               isExistingSale.value = false;
               if(index ==_controller.prAddList.length){
-                print("I know this is it");
+                AppLogger.debug('Adding new product to sale', tag: 'Sale');
                 setState(() {
                   _controller.product = response;
                   _controller.prodName = response.productName;
@@ -728,7 +726,6 @@ String getTotalAmount(){
     }else if(_controller.prAddList.isNotEmpty){
       _controller.totalAmount=0.0;
       for (var element = 0; element < _controller.prAddList.length; element++) {
-        print("the quantity is:${_controller.qtyList[element]} at point${element}");
           _controller.totalAmount = _controller.totalAmount + (_controller.qtyList[element] *
               _controller.prAddList[element].data.sellingPrice);
       }
@@ -750,7 +747,6 @@ String getTotalAmount(){
         _controller.totalSaleCost = answer;
         _controller.tempQty = res.toInt();
       });
-      print(answer);
     } else {
       setState(() {
         _controller.totalSaleCost = 0;

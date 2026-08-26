@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:smerp_go/cubit/reportAnalysisDownload/report_analysis_download_cubit.dart';
 import 'package:smerp_go/model/response/report/salesAnalysis.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
 import 'package:smerp_go/utils/UserUtils.dart';
 import 'package:smerp_go/utils/mockdata/tempData.dart' as tempData;
 import '../cubit/products/product_cubit.dart';
@@ -43,7 +44,7 @@ class ReportController extends GetxController {
 
 
   void setSalesAnalysisTempData(SaleAnalysisSuccess state) {
-    print("ressssspppp: ${state.response.runtimeType}");
+    AppLogger.debug('Sales analysis cached period=${period!.value}', tag: 'Report');
     switch (period!.value){
       case 0:tempData.saleAnalysisThisWeek=state.response;
       break;
@@ -57,7 +58,7 @@ class ReportController extends GetxController {
   }
 
   void setProductAnalysisTempData(ProductAnalysisSuccess state) {
-    print("resp: ${state.response.runtimeType}");
+    AppLogger.debug('Product analysis cached period=${inventoryPeriod.value}', tag: 'Report');
     switch (inventoryPeriod.value){
       case 0:tempData.productAnalysisThisWeek=state.response;
       break;

@@ -6,8 +6,9 @@ import 'package:smerp_go/model/response/notificationList.dart';
 import '../apiServiceLayer/apiService.dart';
 import '../model/response/defaultApiResponse.dart';
 import '../utils/appUrl.dart';
+import 'package:smerp_go/core/repositories/i_notification_repository.dart';
 
-class NotificationRepo extends ApiRepository {
+class NotificationRepo extends ApiRepository implements INotificationRepository {
   Future<Object> getNotificationList()async{
     var response = await ApiService.makeApiCall(null,AppUrls().getNotificationList,
         method: HTTP_METHODS.get);
@@ -15,16 +16,15 @@ class NotificationRepo extends ApiRepository {
     if(r is DefaultApiResponse){
       if(r.isSuccess){
         List<NotificationList> res = notificationListFromJson(json.encode(r.data));
-        print("response here:${res.length}");
-        print("response here:${res.runtimeType}");
+        logRepoSuccess('getNotificationList', count: res.length);
         return res;
       }else{
-        print("failed response here:${r}");
+        logRepoFailure('getNotificationList', r);
         return r;
       }
     }
     else{
-      print("failed2 response here:${r}");
+      logRepoFailure('getNotificationList', r);
       handleErrorResponse(response);
       return errorResponse!;
     }

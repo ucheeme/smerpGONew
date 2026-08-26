@@ -79,7 +79,7 @@ class LoginData {
     storePhoneNumber: json["storePhoneNumber"],
     storeEmail: json["storeEmailAddress"],
     avatar: json["avatar"],
-    token: json["token"],
+    token: json["token"] ?? "",
     deviceId: json['deviceId'],
     deviceMIME: json['deviceMIME'],
     deviceType: json['deviceType']

@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:intl/intl.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
 import 'package:smerp_go/controller/report.dart';
 import 'package:smerp_go/cubit/reportAnalysisDownload/report_analysis_download_cubit.dart';
 import 'package:smerp_go/model/response/report/performingAnalysis.dart';
@@ -264,7 +265,7 @@ bool isFirst= false;
                                     await Get.bottomSheet(Container(
                                         height: 380.h,
                                         child: ReportDateFilter()));
-                                    print(_controller.inventoryPeriod.value);
+                                    AppLogger.debug('Inventory report period=${_controller.inventoryPeriod.value}', tag: 'Report');
                                     if(_controller.inventoryPeriod.value!=4){
                                       iPeriod=0;
                                       cubit.getProductReportAnalysis(
@@ -605,7 +606,7 @@ bool isFirst= false;
   }
 
   void setProductAnalysisTempData(ProductAnalysisSuccess state) {
-    print("resp: ${state.response.runtimeType}");
+    AppLogger.debug('Product analysis cached period=${_controller.inventoryPeriod.value}', tag: 'Report');
     switch (_controller.inventoryPeriod.value){
       case 0:productAnalysisThisWeek=state.response;
       break;

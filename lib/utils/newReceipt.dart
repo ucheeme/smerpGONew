@@ -14,6 +14,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
 import 'package:smerp_go/utils/AppUtils.dart';
 import 'package:smerp_go/utils/appDesignUtil.dart';
 
@@ -50,13 +51,12 @@ class _SmerpGoReceiptState extends State<SmerpGoReceipt> {
   void initState() {
     data = widget.saleListInfo;
     orderData = widget.items;
-    print("this is the payment status:${widget.paymentStatus}");
+    AppLogger.debug('New receipt widget initialized', tag: 'Receipt');
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
     final dateTime = DateTime.now();
-    print(dateTime.format(DateTimeFormats.american));
     datePlaced = (widget.orderPlacedAt==null)?
     formatDate(
         widget.orderPlacedAt!,

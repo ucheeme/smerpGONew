@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
 import 'package:smerp_go/cubit/bankDetail/bank_details_cubit.dart';
 import 'package:smerp_go/model/response/defaultApiResponse.dart';
 import 'package:smerp_go/model/response/salesDashboard.dart';
@@ -19,6 +20,8 @@ import '../utils/AppUtils.dart';
 import '../utils/appUrl.dart';
 import '../utils/app_services/helperClass.dart';
 import '../utils/mockdata/tempData.dart';
+import 'package:smerp_go/core/cache/app_list_cache.dart';
+import 'package:smerp_go/core/cache/app_list_cache_keys.dart';
 
 class DashboardController extends GetxController{
   RxString storeName = "".obs;
@@ -108,7 +111,7 @@ class DashboardController extends GetxController{
         try{
           BankDetailReponse data = bankDetailReponseFromJson(json.encode(r.data));
           isLoading.value = false;
-          print("this is my value $data");
+          AppLogger.debug('Bank details loaded', tag: 'Dashboard');
           storeBankDetail=data;
           isSaleDashboardLoading.value = false;
           return data;
@@ -143,8 +146,9 @@ class DashboardController extends GetxController{
           isLoading.value = false;
           if (data.data!.isEmpty) {
             (isRefresh) ? refreshController?.refreshCompleted() : null;
-            isOrderListHasRun.value = false;
+            isOrderListHasRun = false;
             orderListTemp = data.data!;
+            AppListCache.invalidate(AppListCacheKeys.orders);
             orderCount.value =orderListTemp.where((element) =>
             element.isAccepted=="Pending" ||element.isAccepted =="Accepted")
                 .length;
@@ -152,6 +156,7 @@ class DashboardController extends GetxController{
           } else {
             (isRefresh) ? refreshController?.refreshCompleted() : null;
             orderListTemp = data.data!;
+            AppListCache.markFresh(AppListCacheKeys.orders);
             orderCount.value =orderListTemp.where((element) =>
             element.isAccepted=="Pending" ||element.isAccepted =="Accepted")
                 .length;
@@ -181,14 +186,14 @@ class DashboardController extends GetxController{
 
 
   void filterByName(String enteredValue){
-    print("Hey broo");
+    AppLogger.debug('filterByName', tag: 'Dashboard');
     saleList = saleListTemp.where((element) =>
        element.customerName.toLowerCase().
        contains(enteredValue.toLowerCase())).toList();
   }
 
   void filterByPaymentStatus(String paymentStatus){
-    print(paymentStatus);
+    AppLogger.debug('filterByPaymentStatus: $paymentStatus', tag: 'Dashboard');
     if(paymentStatus=="Unpaid"){
       paymentStatus = "NotPaid";
     }
@@ -198,8 +203,7 @@ class DashboardController extends GetxController{
   }
 
   void filterByDate(RxList<DateTime?> dateRange){
-    print(dateRange[0]);
-    print(dateRange[1]);
+    AppLogger.debug('filterByDate range selected', tag: 'Dashboard');
     if(dateRange.value.isEmpty||dateRange.value==null){
       saleList=saleListTemp;
     }else if(isTodayFilter.isTrue){
@@ -208,7 +212,7 @@ class DashboardController extends GetxController{
           && date.createdOn.year== dateRange[0]!.year && date.createdOn.day ==dateRange[0]!.day
       ).toList();
       isTodayFilter.value=false;
-      print(saleList);
+      AppLogger.debug('Today filter applied, count=${saleList.length}', tag: 'Dashboard');
     }else{
       DateFormat format = DateFormat('yyyy-MM-dd');
       DateTime startDateObj = format.parse(dateRange[0]!.toIso8601String());
@@ -258,6 +262,7 @@ class DashboardController extends GetxController{
           salesDashboard();
           userOrders();
           saleListTemp= data.data!;
+          AppListCache.markFresh(AppListCacheKeys.sales);
           if(data.data!.isEmpty){
             saleIsEmpty.value= true;
           }else{

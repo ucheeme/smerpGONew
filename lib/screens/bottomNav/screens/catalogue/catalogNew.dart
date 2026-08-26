@@ -8,6 +8,9 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/routes/transitions_type.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
+import 'package:smerp_go/core/cache/app_list_cache.dart';
+import 'package:smerp_go/core/cache/app_list_cache_keys.dart';
 import 'package:smerp_go/screens/bottomNav/screens/inventory/allIProductd.dart';
 
 import '../../../../controller/catalogueController.dart';
@@ -47,15 +50,15 @@ class _CatalogNewState extends State<CatalogNew> with TickerProviderStateMixin {
     _controllerTab = TabController(length: 8, vsync: this);
     _controller.isAll.value = true;
     dashboardApi();
-    getCatalogCall();
 
     super.initState();
-    if (!isCatalogListHasRun.value) {
-      getCatalogCall();
-    } else {
-      print("alreadyCalled");
-      print(catalogsFTemp.length);
+    if (AppListCache.shouldServe(
+        AppListCacheKeys.catalog, isCatalogListHasRun.value)) {
+      AppLogger.debug('Catalog cache loaded count=${catalogsFTemp.length}', tag: 'Catalogue');
       catalogs = catalogsFTemp;
+    } else {
+      isCatalogListHasRun.value = false;
+      getCatalogCall();
     }
   }
 
@@ -110,7 +113,8 @@ class _CatalogNewState extends State<CatalogNew> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _controller.dispose();
+    refreshController.dispose();
+    _controllerTab?.dispose();
     super.dispose();
   }
 

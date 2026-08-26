@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:smerp_go/core/logging/app_logger.dart';
 // To save the file in the device
 class FileStorage {
   static Future<String> getExternalDocumentPath() async {
@@ -29,7 +30,7 @@ class FileStorage {
     }
 
     final exPath = _directory.path;
-    print("Saved Path: $exPath");
+    AppLogger.debug('File storage path ready', tag: 'Storage');
     await Directory(exPath).create(recursive: true);
     return exPath;
   }
@@ -47,7 +48,7 @@ class FileStorage {
     // Create a file for the path of
     // device and file name with extension
     File file= File('$path/$name');;
-    print("Save file");
+    AppLogger.debug('Saving file name=$name', tag: 'Storage');
 
     // Write the data in the file you have created
     return file.writeAsString(bytes);

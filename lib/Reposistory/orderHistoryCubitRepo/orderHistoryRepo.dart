@@ -7,8 +7,9 @@ import 'package:smerp_go/model/response/defaultApiResponse.dart';
 import '../../model/response/order/orderHistory.dart';
 import '../../utils/appUrl.dart';
 import '../apiRepo.dart';
+import 'package:smerp_go/core/repositories/i_order_history_repository.dart';
 
-class OrderHistoryRepo extends ApiRepository{
+class OrderHistoryRepo extends ApiRepository implements IOrderHistoryRepository{
 
   Future<Object> getOrderHistory()async{
     var response = await ApiService.makeApiCall(null,AppUrls.orderHistory(),
@@ -17,31 +18,17 @@ class OrderHistoryRepo extends ApiRepository{
     if(r is DefaultApiResponse){
       if(r.isSuccess){
         List<HistoryOrder> res = orderHistoryFromJson(json.encode(r.data));
-        print("response here:${res.length}");
+        logRepoSuccess('getOrderHistory', count: res.length);
         return res;
       }else{
-        print("failed response here:${r}");
+        logRepoFailure('getOrderHistory', r);
         return r;
       }
     }
     else{
-      print("failed2 response here:${r}");
+      logRepoFailure('getOrderHistory', r);
       handleErrorResponse(response);
       return errorResponse!;
     }
-    // if(response is Success){
-    //   try{
-    //     OrderHistory data = orderHistoryFromJson(await response.response as String);
-    //     if(data.isSuccess){
-    //       return data.data;
-    //     }
-    //   }catch(e, trace){
-    //     return [];
-    //   }
-    // }else if(response is Failure){
-    //   var repo = ApiRepository();
-    //   repo.handleErrorResponse(response);
-    // }
-    // return [];
   }
 }

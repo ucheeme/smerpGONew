@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:date_format/date_format.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -592,7 +593,6 @@ class _EditSaleState extends State<EditSale> {
       setState(() {
         _controller.editTotalSaleCost = answer;
       });
-      print(answer);
     } else {
       setState(() {
         _controller.editTotalSaleCost = 0;

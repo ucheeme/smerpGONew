@@ -101,7 +101,6 @@ class _ForGotSignInPinState extends State<ForGotSignInPin> {
                           gapHeight(302.h),
                           GestureDetector(
                             onTap: () {
-                              print("fdfb");
                               if (_controller.isSetForgotPinViaPhone.value) {
                                 if (validateMobile(
                                     _controller.setForgotPinPhoneNumber.text)) {

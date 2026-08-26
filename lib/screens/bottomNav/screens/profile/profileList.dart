@@ -6,6 +6,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:smerp_go/core/session/credential_storage.dart';
+import 'package:smerp_go/core/session/session_manager.dart';
 import 'package:smerp_go/controller/profileController.dart';
 import 'package:smerp_go/cubit/bankDetail/bank_details_cubit.dart';
 import 'package:smerp_go/screens/authentication_signup/signInFlow/signin.dart';
@@ -164,7 +166,6 @@ class _ProfileState extends State<Profile> {
                                         onTap: () async {
                                           final box = context.findRenderObject()
                                               as RenderBox;
-                                          print("i am here");
                                           await Share.share(
                                               "https://go.smerp.io/${loginData!.merchantCode}",
                                               sharePositionOrigin:
@@ -359,7 +360,6 @@ class _ProfileState extends State<Profile> {
                                   //     'Check Out this app I use to manage my business $appLink');
                                       final box = context.findRenderObject()
                                       as RenderBox;
-                                      print("i am here");
                                       await Share.share(
                                           "Hey 👋, I’m using Smerp Go - Grow your business on the Go! Boost your business with bookkeeping, inventory magic, smart analysis, and a FREE online website. Don't miss out – give it a whirl now! 🚀💼💻\n"
                                            "https://go.smerp.io",
@@ -401,29 +401,12 @@ class _ProfileState extends State<Profile> {
                                 ),
                                 gapHeight(30.h),
                                 GestureDetector(
-                                  onTap: () {
+                                  onTap: () async {
                                     _controllerProfile.isLoading.value = true;
-                                    productCategoryList = [];
-                                    productUnitCategoryList = [];
-                                    inventoryListTemp = [];
-                                    catalogListTemp = [];
-                                    catalogsFTemp = [];
-                                    saleListTemp = [];
-                                    actionBy = "";
-                                    inventoryId = "";
-                                    isLoading.value = false;
-                                    isSignUpViaPhone.value = true;
-                                    userIdentityValue = null;
-                                    identitySource = null;
-                                    otpCreateAccout = "";
-                                    loginData = null;
-                                    isProductCategoryHasRun = Rx(false);
-                                    isProductUnitCategoryHasRun = Rx(false);
-                                    isInventoryListHasRun = false;
-                                    isSalesListHasRun = Rx(false);
-                                    isCatalogListHasRun = Rx(false);
-                                    saleIsEmpty = RxBool(false);
-                                    productIsEmpty = RxBool(false);
+                                    await SessionManager.clearSession();
+                                    if (!context.mounted) {
+                                      return;
+                                    }
                                     Navigator.pushAndRemoveUntil(
                                         context,
                                         MaterialPageRoute(
@@ -558,12 +541,19 @@ class _ProfileState extends State<Profile> {
   //   }
   //
   // }
+  @override
+  void dispose() {
+    refreshController.dispose();
+    super.dispose();
+  }
+
   Future<void> onRefresh() async {
     bool res = await _controllerProfile.userInfo(
         isRefresh: true, refreshController: refreshController);
     if (res) {
       setState(() {
-        userImage = userImage;
+        // Force rebuild after profile refresh; image is observed via AuthSession.
+        userImage.value = userImage.value;
       });
     }
   }

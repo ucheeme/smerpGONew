@@ -3,6 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
+import 'package:smerp_go/core/cache/app_list_cache.dart';
+import 'package:smerp_go/core/cache/app_list_cache_keys.dart';
 import 'package:smerp_go/model/response/defaultApiResponse.dart';
 import 'package:smerp_go/model/response/order/orderDetails.dart';
 import 'package:smerp_go/utils/mockdata/tempData.dart';
@@ -39,7 +42,7 @@ var orderAcceptance= RxBool(false);
     }
   }
   void filterByPaymentStatus(String paymentStatus) {
-    print(paymentStatus);
+    AppLogger.debug('filterByPaymentStatus: $paymentStatus', tag: 'Order');
     if (paymentStatus == "Unpaid") {
       paymentStatus = "NotPaid";
     }
@@ -52,8 +55,7 @@ var orderAcceptance= RxBool(false);
   }
 
   void filterByDate(RxList<DateTime?> dateRange) {
-    print(dateRange[0]);
-    print(dateRange[1]);
+    AppLogger.debug('filterByDate range selected', tag: 'Order');
     if (dateRange.value.isEmpty || dateRange.value == null) {
       orderList = orderListTemp;
     } else {
@@ -310,11 +312,13 @@ var orderAcceptance= RxBool(false);
           isLoading.value = false;
           if (data.data!.isEmpty) {
             (isRefresh) ? refreshController?.refreshCompleted() : null;
-            isOrderListHasRun.value = false;
+            isOrderListHasRun = false;
+            AppListCache.invalidate(AppListCacheKeys.orders);
             return [];
           } else {
             (isRefresh) ? refreshController?.refreshCompleted() : null;
             orderListTemp = data.data!;
+            AppListCache.markFresh(AppListCacheKeys.orders);
             return data.data!;
           }
         } else {
@@ -335,5 +339,11 @@ var orderAcceptance= RxBool(false);
       repo.handleErrorResponse(response);
     }
     return [];
+  }
+
+  @override
+  void onClose() {
+    customerNameController.dispose();
+    super.onClose();
   }
 }

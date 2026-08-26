@@ -1,7 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
+import 'package:smerp_go/core/repositories/i_collection_repository.dart';
 import 'package:smerp_go/model/response/collectionResponse.dart';
-import '../../Reposistory/productListRepo.dart';
 import '../../model/collectionDetail.dart';
 import '../../model/response/defaultApiResponse.dart';
 import '../../model/response/getCollectionList.dart';
@@ -12,22 +13,21 @@ import '../../utils/mockdata/tempData.dart';
 part 'product_state.dart';
 
 class CollectionCubit extends Cubit<CollectionState> {
-  final CollectionRepo productListRepo;
+  final ICollectionRepository productListRepo;
   CollectionCubit({required this.productListRepo}) : super(ProductInitialState());
   void getProductList()async{
     try{
       emit(CollectionLoadingState());
       final response= await productListRepo.getProductList();
       if(response is List<InventoryInfo>){
-        print("I emitted");
+        AppLogger.debug('Product list loaded count=${response.length}', tag: 'CollectionCubit');
        emit(ProductListSuccessState(response));
-        print("response:${response.length}");
       }else{
        emit(ProductListErrorState(response as DefaultApiResponse));
-        print("The type is: ${response.runtimeType}");
+        AppLogger.warning('Unexpected product list response type=${response.runtimeType}', tag: 'CollectionCubit');
       }
-    }catch(e, strace){
-      print("faileeeed: $e and $strace");
+    }catch(e, stackTrace){
+      AppLogger.error(e, stackTrace, reason: 'getProductList', tag: 'CollectionCubit');
       emit(ProductListErrorState(AppUtils.defaultErrorResponse()));
    }
   }
@@ -36,15 +36,14 @@ class CollectionCubit extends Cubit<CollectionState> {
       emit(CollectionLoadingState());
       final response= await productListRepo.getCollectionList(userMerchantCode!);
       if(response is  List<CollectionList>){
-        print("I emitted");
+        AppLogger.debug('Collection list loaded count=${response.length}', tag: 'CollectionCubit');
         emit(CollectionListSuccessState(response));
-        print("response:${response.length}");
       }else{
         emit(ProductListErrorState(response as DefaultApiResponse));
-        print("The type is: ${response.runtimeType}");
+        AppLogger.warning('Unexpected collection list response type=${response.runtimeType}', tag: 'CollectionCubit');
       }
-    }catch(e, strace){
-      print("faileeeed: $e and $strace");
+    }catch(e, stackTrace){
+      AppLogger.error(e, stackTrace, reason: 'getCollectionList', tag: 'CollectionCubit');
       emit(ProductListErrorState(AppUtils.defaultErrorResponse()));
     }
   }
@@ -54,14 +53,13 @@ class CollectionCubit extends Cubit<CollectionState> {
       emit(CollectionLoadingState());
       final response= await productListRepo.getCollectionDetail(collectionId);
       if(response is CollectionDetail){
-        print("I emitted");
         emit(CollectionDetailState(response));
       }else{
         emit(ProductListErrorState(response as DefaultApiResponse));
-        print("The type is: ${response.runtimeType}");
+        AppLogger.warning('Unexpected collection detail response type=${response.runtimeType}', tag: 'CollectionCubit');
       }
-    }catch(e, strace){
-      print("faileeeed: $e and $strace");
+    }catch(e, stackTrace){
+      AppLogger.error(e, stackTrace, reason: 'getCollectionDetail', tag: 'CollectionCubit');
       emit(ProductListErrorState(AppUtils.defaultErrorResponse()));
     }
   }
@@ -81,13 +79,12 @@ class CollectionCubit extends Cubit<CollectionState> {
       collectionImage: collectionImage,
           collectionDescription: collectionDescription);
       if (response is CollectionCreatedResponse) {
-        print("I emitted");
         emit(CollectionCreatedState(response));
       } else {
         emit(ProductListErrorState(response as DefaultApiResponse));
       }
-    } catch (e, strace) {
-      print("faileeeed: $e and $strace");
+    } catch (e, stackTrace) {
+      AppLogger.error(e, stackTrace, reason: 'createCollection', tag: 'CollectionCubit');
       emit(ProductListErrorState(AppUtils.defaultErrorResponse()));
     }
   }
@@ -97,21 +94,20 @@ class CollectionCubit extends Cubit<CollectionState> {
           element.name.toLowerCase().contains(name.toLowerCase())
       ).toList();
       emit(CollectionFilteringState(filtered));
-    print(filtered.length);
+    AppLogger.debug('Filtered collections count=${filtered.length}', tag: 'CollectionCubit');
   }
   void deleteCollection(String collectionId)async {
     try {
       emit(CollectionLoadingState());
       final response = await productListRepo.deleteCollection(collectionId);
       if (response is DefaultApiResponse && response.isSuccess == true) {
-        print("I emitted");
         emit(CollectionDeletedState(response));
       } else {
         emit(ProductListErrorState(response as DefaultApiResponse));
-        print("The type is: ${response.runtimeType}");
+        AppLogger.warning('Delete collection unexpected response type=${response.runtimeType}', tag: 'CollectionCubit');
       }
-    } catch (e, strace) {
-      print("faileeeed: $e and $strace");
+    } catch (e, stackTrace) {
+      AppLogger.error(e, stackTrace, reason: 'deleteCollection', tag: 'CollectionCubit');
       emit(ProductListErrorState(AppUtils.defaultErrorResponse()));
     }
   }
@@ -129,14 +125,13 @@ class CollectionCubit extends Cubit<CollectionState> {
           collectionImage: collectionImage,
           collectionDescription: collectionDescription);
       if (response is DefaultApiResponse && response.isSuccess == true) {
-        print("I emitted");
         emit(CollectionUpdatedState(response));
       } else {
         emit(ProductListErrorState(response as DefaultApiResponse));
-        print("The type is: ${response.runtimeType}");
+        AppLogger.warning('Update collection unexpected response type=${response.runtimeType}', tag: 'CollectionCubit');
       }
-    } catch (e, strace) {
-      print("faileeeed: $e and $strace");
+    } catch (e, stackTrace) {
+      AppLogger.error(e, stackTrace, reason: 'updateCollection', tag: 'CollectionCubit');
       emit(ProductListErrorState(AppUtils.defaultErrorResponse()));
     }
   }

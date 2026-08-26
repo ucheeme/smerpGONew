@@ -7,6 +7,7 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
 import 'package:smerp_go/controller/report.dart';
 import 'package:smerp_go/utils/AppUtils.dart';
 import 'package:smerp_go/utils/appColors.dart';
@@ -219,9 +220,9 @@ class _DownloadReportStepTwoDesignState extends State<DownloadReportStepTwoDesig
                             selectedDateRange= dateTimeRange;
                             _controller.dateChange.value="From: $startDate       To: $endDate";
                           });
-                          print(selectedDateRange!.length);
+                          AppLogger.debug('Report date range selected length=${selectedDateRange!.length}', tag: 'Report');
                         }else{
-                          print("resssstttt");
+                          AppLogger.debug('Report date range selection cancelled', tag: 'Report');
                         }
                       },
                         child: textFieldBorderWidget(

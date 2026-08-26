@@ -19,6 +19,8 @@ import '../utils/AppUtils.dart';
 import '../utils/appUrl.dart';
 import '../utils/app_services/helperClass.dart';
 import '../utils/mockdata/tempData.dart';
+import 'package:smerp_go/core/cache/app_list_cache.dart';
+import 'package:smerp_go/core/cache/app_list_cache_keys.dart';
 
 class InventoryController extends GetxController{
   var inventoryIsEmpty = RxBool(false);
@@ -77,6 +79,7 @@ class InventoryController extends GetxController{
           isLoading.value = false;
           inventoryList= data.data!;
           inventoryListTemp= data.data!;
+          AppListCache.markFresh(AppListCacheKeys.inventory);
           inventoryDashboard();
           if(data.data!.isEmpty){
             inventoryIsEmpty.value= true;
@@ -96,6 +99,7 @@ class InventoryController extends GetxController{
           null;
           inventoryList =[];
          inventoryListTemp= inventoryList;
+          AppListCache.markFresh(AppListCacheKeys.inventory);
           inventoryIsEmpty.value=false;
         //  productIsEmpty.value=false;
           return [];

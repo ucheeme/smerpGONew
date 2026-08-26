@@ -65,4 +65,13 @@ class ProductController extends GetxController{
   }
     return 0;
   }
+
+  @override
+  void onClose() {
+    productName.dispose();
+    productCostPrice.dispose();
+    productSellingPrice.dispose();
+    productQuantity.dispose();
+    super.onClose();
+  }
 }

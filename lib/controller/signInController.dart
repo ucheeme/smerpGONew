@@ -15,6 +15,8 @@ import 'package:smerp_go/model/request/createProduct.dart';
 import 'package:smerp_go/model/response/LoginResponse.dart';
 import 'package:smerp_go/model/response/signInUser.dart';
 import 'package:smerp_go/screens/authentication_signup/signInFlow/validateNewDevice.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
+import 'package:smerp_go/core/session/credential_storage.dart';
 import 'package:smerp_go/utils/UserUtils.dart';
 import 'package:smerp_go/utils/appUrl.dart';
 
@@ -63,12 +65,10 @@ Future<bool> loginUser(String? id, String pin,{context}) async{
   isLoading.value= true;
   if(await SharedPref.getBool("keepUserInfo")){
     String e = await SharedPref.read("userId");
-    print(e);
     id = e.substring(1, e.length - 1);
    //id =e
     update();
   }
-print(id);
 
   Login? login;
 
@@ -82,7 +82,6 @@ print(id);
         loginData=null;
         isLoading.value = false;
          actionBy=AppUrls().getActionBy(data.data!.userId);
-        SharedPref.save("userInfo", data.data);
         SharedPref.saveBool("keepUserInfo", true);
         SharedPref.save("userIdentityValue", id);
         SharedPref.save("userFirstName", data.data!.firstName);
@@ -99,6 +98,13 @@ print(id);
       //  actionBy = data.data.userId;
         userMerchantCode = data.data!.merchantCode;
         userAccessToken = data.data!.token;
+        await CredentialStorage.saveAccessToken(data.data!.token);
+        await CredentialStorage.savePin(pin);
+        final persistedUserInfo =
+            await CredentialStorage.sanitizeLoginJsonForPersistence(
+          data.data!.toJson(),
+        );
+        SharedPref.save("userInfo", persistedUserInfo);
         userImage.value= data.data!.avatar;
         userFirstName =data.data!.firstName;
      // salesDashboard();
@@ -126,8 +132,8 @@ print(id);
                   backgroundColor: Colors.red.withOpacity(0.5),
                   colorText: Colors.white,);
               }
-            }catch(e){
-              print("$e");
+            }catch(e, trace){
+              AppLogger.error(e, trace, reason: 'authenticateDevice', tag: 'SignIn');
             }
           }
           Get.off(MainNavigationScreen(),
@@ -169,14 +175,13 @@ return true;
       }
     }catch(e, trace){
       isLoading.value = false;
-      print(e);
-      print(trace);
+      AppLogger.error(e, trace, reason: 'loginUser', tag: 'SignIn');
      // return false;
     }
   }
   else if(response is Failure){
     try{
-      print("this is the response ${response.errorResponse}");
+      AppLogger.debug('Sign-in failure response received', tag: 'SignIn');
       var data = defaultApiResponseFromJson(response.errorResponse as String);
 
       isLoading.value=false;
@@ -186,8 +191,7 @@ return true;
         colorText: Colors.white,);
     }catch(e,trace){
       isLoading.value=false;
-   print(e);
-   print(trace);
+      AppLogger.error(e, trace, reason: 'loginUser failure parse', tag: 'SignIn');
     }
 
   }else{
@@ -200,7 +204,7 @@ return true;
 }
 
   void testing() {
-    print("aha");
+    AppLogger.debug('testing()', tag: 'SignIn');
   }
 
   Future<void>  inventoryDashboard({isRefresh=
@@ -272,8 +276,7 @@ return true;
             colorText: Colors.white,);
         }
       }catch(e, trace){
-        print(e);
-        print(trace);
+        AppLogger.error(e, trace, reason: 'verifyUserNewDevice', tag: 'SignIn');
         isLoading.value = false;
       }
     }else{
@@ -312,8 +315,7 @@ return true;
             colorText: Colors.white,);
         }
       }catch(e, trace){
-        print(e);
-        print(trace);
+        AppLogger.error(e, trace, reason: 'tokenValidationNewDevice', tag: 'SignIn');
         isLoading.value = false;
       }
     } else{
@@ -402,8 +404,7 @@ return true;
           colorText: Colors.white,);
       }
     } catch (e, trace) {
-      print(e);
-      print(trace);
+      AppLogger.error(e, trace, reason: 'signInUsers', tag: 'SignIn');
       isLoading.value = false;
    }
   }else{
@@ -420,7 +421,19 @@ return true;
 // }
 @override
   void onInit() {
-    print("in it");
+    AppLogger.debug('SignInController onInit', tag: 'SignIn');
     super.onInit();
+  }
+
+  @override
+  void onClose() {
+    pinValueControllerDevice.dispose();
+    pinValueController.dispose();
+    pinValueController2.dispose();
+    signInPhoneNumber.dispose();
+    signInEmailAddress.dispose();
+    errorController.close();
+    errorController2.close();
+    super.onClose();
   }
 }

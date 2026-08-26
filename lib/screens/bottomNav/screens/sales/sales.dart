@@ -19,6 +19,8 @@ import '../../../../utils/appDesignUtil.dart';
 import '../../../../utils/app_services/helperClass.dart';
 import '../../../../utils/mockdata/mockInventoryData.dart';
 import '../../../../utils/mockdata/tempData.dart';
+import 'package:smerp_go/core/cache/app_list_cache.dart';
+import 'package:smerp_go/core/cache/app_list_cache_keys.dart';
 import '../../../bottomsheets/dashboardFilterOption.dart';
 import '../../../bottomsheets/deleteOption.dart';
 import '../../../bottomsheets/receipt.dart';
@@ -41,7 +43,7 @@ class _SalesState extends State<Sales> {
       initialRefresh: false);
 
   void getSaleCall() async {
-    if (isSalesListHasRun.value == false) {
+    if (!AppListCache.hasLoaded(AppListCacheKeys.sales)) {
       loading = true;
     }
     saleList = await _controllerDashboard.allSaleList();
@@ -57,16 +59,16 @@ class _SalesState extends State<Sales> {
         }
       });
     });
-    isSalesListHasRun.value = true;
+    AppListCache.setHasLoaded(AppListCacheKeys.sales, true);
   }
 
   @override
   void initState() {
     super.initState();
-    if (!isSalesListHasRun.value) {
-      getSaleCall();
-    } else {
+    if (AppListCache.shouldServeKey(AppListCacheKeys.sales)) {
       saleList = saleListTemp;
+    } else {
+      getSaleCall();
     }
   }
 
@@ -234,7 +236,7 @@ class _SalesState extends State<Sales> {
                                       await _controllerDashboard
                                           .allSaleList(
                                           isRefresh: true,
-                                          refreshController: refreshController);
+                                          refreshController: refreshController2);
                                       setState(() {
                                         _controllerDashboard
                                             .saleList =
@@ -293,5 +295,11 @@ class _SalesState extends State<Sales> {
     setState(() {
       saleList = saleList;
     });
+  }
+
+  @override
+  void dispose() {
+    refreshController2.dispose();
+    super.dispose();
   }
 }

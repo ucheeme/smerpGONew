@@ -1,9 +1,10 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
+import 'package:smerp_go/core/repositories/i_report_analysis_repository.dart';
 import 'package:smerp_go/model/response/defaultApiResponse.dart';
 import 'package:smerp_go/model/response/report/yearSaleReport.dart';
 
-import '../../Reposistory/reportAnalysisRepo.dart';
 import '../../model/response/report/customRangeSales.dart';
 import '../../model/response/report/performingAnalysis.dart';
 import '../../model/response/report/productAnalysis.dart';
@@ -13,7 +14,7 @@ import '../../utils/AppUtils.dart';
 part 'report_analysis_download_state.dart';
 
 class ReportAnalysisDownloadCubit extends Cubit<ReportAnalysisDownloadState> {
-  final ReportAnalysisRepo repo;
+  final IReportAnalysisRepository repo;
   ReportAnalysisDownloadCubit(this.repo) : super(ReportAnalysisDownloadInitial());
 
   void downloadSaleReport(String saleType, String period,String type)async{
@@ -26,7 +27,7 @@ class ReportAnalysisDownloadCubit extends Cubit<ReportAnalysisDownloadState> {
         emit(ReportAnalysisDownloadErrorState(response as DefaultApiResponse));
       }
     }catch(e, strace){
-      print("faileeeed: $e and $strace");
+      AppLogger.error(e, strace, reason: 'reportAnalysis', tag: 'ReportCubit');
       emit(ReportAnalysisDownloadErrorState(AppUtils.defaultErrorResponse()));
     }
   }
@@ -41,7 +42,7 @@ class ReportAnalysisDownloadCubit extends Cubit<ReportAnalysisDownloadState> {
         emit(ReportAnalysisDownloadErrorState(response as DefaultApiResponse));
       }
     }catch(e, strace){
-      print("faileeeed: $e and $strace");
+      AppLogger.error(e, strace, reason: 'reportAnalysis', tag: 'ReportCubit');
       emit(ReportAnalysisDownloadErrorState(AppUtils.defaultErrorResponse()));
     }
   }
@@ -56,7 +57,7 @@ class ReportAnalysisDownloadCubit extends Cubit<ReportAnalysisDownloadState> {
         emit(ReportAnalysisDownloadErrorState(response as DefaultApiResponse));
       }
     } catch (e, strace) {
-      print("faileeeed: $e and $strace");
+      AppLogger.error(e, strace, reason: 'reportAnalysis', tag: 'ReportCubit');
       emit(ReportAnalysisDownloadErrorState(AppUtils.defaultErrorResponse()));
     }
   }
@@ -71,7 +72,7 @@ class ReportAnalysisDownloadCubit extends Cubit<ReportAnalysisDownloadState> {
         emit(ReportAnalysisDownloadErrorState(response as DefaultApiResponse));
       }
     }catch(e, strace){
-      print("faileeeed: $e and $strace");
+      AppLogger.error(e, strace, reason: 'reportAnalysis', tag: 'ReportCubit');
       emit(ReportAnalysisDownloadErrorState(AppUtils.defaultErrorResponse()));
     }
   }
@@ -86,7 +87,7 @@ class ReportAnalysisDownloadCubit extends Cubit<ReportAnalysisDownloadState> {
         emit(ReportAnalysisDownloadErrorState(response as DefaultApiResponse));
       }
     }catch(e, strace){
-      print("faileeeed: $e and $strace");
+      AppLogger.error(e, strace, reason: 'reportAnalysis', tag: 'ReportCubit');
       emit(ReportAnalysisDownloadErrorState(AppUtils.defaultErrorResponse()));
     }
   }
@@ -101,7 +102,7 @@ class ReportAnalysisDownloadCubit extends Cubit<ReportAnalysisDownloadState> {
         emit(ReportAnalysisDownloadErrorState(response as DefaultApiResponse));
       }
     }catch(e, strace){
-      print("faileeeed: $e and $strace");
+      AppLogger.error(e, strace, reason: 'reportAnalysis', tag: 'ReportCubit');
       emit(ReportAnalysisDownloadErrorState(AppUtils.defaultErrorResponse()));
     }
   }
@@ -118,7 +119,7 @@ class ReportAnalysisDownloadCubit extends Cubit<ReportAnalysisDownloadState> {
        // print("The type is: ${response.runtimeType}");
       }
     }catch(e, strace){
-      print("faileeeed: $e and $strace");
+      AppLogger.error(e, strace, reason: 'reportAnalysis', tag: 'ReportCubit');
       emit(ReportAnalysisDownloadErrorState(AppUtils.defaultErrorResponse()));
     }
   }
@@ -133,7 +134,7 @@ class ReportAnalysisDownloadCubit extends Cubit<ReportAnalysisDownloadState> {
         emit(ReportAnalysisDownloadErrorState(response as DefaultApiResponse));
       }
     }catch(e, strace){
-      print("faileeeed: $e and $strace");
+      AppLogger.error(e, strace, reason: 'reportAnalysis', tag: 'ReportCubit');
       emit(ReportAnalysisDownloadErrorState(AppUtils.defaultErrorResponse()));
     }
   }
@@ -150,7 +151,7 @@ class ReportAnalysisDownloadCubit extends Cubit<ReportAnalysisDownloadState> {
         emit(ReportAnalysisDownloadErrorState(response as DefaultApiResponse));
       }
     }catch(e, strace){
-      print("faileeeed: $e and $strace");
+      AppLogger.error(e, strace, reason: 'reportAnalysis', tag: 'ReportCubit');
       emit(ReportAnalysisDownloadErrorState(AppUtils.defaultErrorResponse()));
     }
   }

@@ -6,6 +6,7 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
 import 'package:smerp_go/model/response/order/orderHistory.dart';
 import 'package:smerp_go/utils/appColors.dart';
 import 'package:smerp_go/utils/appDesignUtil.dart';
@@ -31,8 +32,7 @@ class _OrderHistoryState extends State<OrderHistory> {
   List<HistoryOrder> searchResults=[];
 
   void filterByDate(RxList<DateTime?> dateRange) {
-    print(dateRange[0]);
-    print(dateRange[1]);
+    AppLogger.debug('Order history date filter selected', tag: 'Order');
     if (dateRange.value.isEmpty || dateRange.value == null) {
      searchResults= widget.orderHistoryLists;
     } else {

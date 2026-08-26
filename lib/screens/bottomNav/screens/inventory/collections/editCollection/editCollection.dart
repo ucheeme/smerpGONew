@@ -178,8 +178,6 @@ class _EditCollectionState extends State<EditCollection> {
                               }
                               _controller.collectionIImage.value=imageString;
 
-                              print("product ids:$ids");
-                              print("product ids:${ widget.collectionDetail!.products.length}");
                               Get.to(
                                 AddProductToCollection(
                                   isUpdateProductCollection: true,

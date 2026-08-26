@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 
+import 'package:smerp_go/core/logging/app_logger.dart';
 import '../main.dart';
 import '../screens/bottomsheets/notification.dart';
 import '../utils/slideUpRoute.dart';
@@ -18,9 +19,8 @@ description: 'This channel is used for important notification',
 importance: Importance.defaultImportance);
 
   Future<void> handleBackgroundMessage(RemoteMessage message) async{
-    print('Title: ${message.notification?.title}');
-    print('Body: ${message.notification?.body}');
-    print('Payload: ${message.data}');
+    AppLogger.debug('Background notification title present: ${message.notification?.title != null}', tag: 'FCM');
+    AppLogger.debug('Background notification data keys: ${message.data.keys.toList()}', tag: 'FCM');
     if(message.isNull) return;
     Get.to(SlideUpRoute(page: NotificationApp()));
   }
@@ -46,7 +46,7 @@ importance: Importance.defaultImportance);
     await _firebaseMessaging.requestPermission();
     final deviceTokenT = await _firebaseMessaging.getToken();
    String deviceTokenEE=deviceTokenT!;
-    print("Token: $deviceTokenT");
+    AppLogger.debug('FCM token obtained', tag: 'FCM');
   initPushNotifications();
   }
 }

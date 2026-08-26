@@ -72,7 +72,6 @@ class _CollectionCreatedState extends State<CollectionCreated> {
                       GestureDetector(
                         onTap: ()async {
                         final box = context.findRenderObject() as RenderBox;
-                        print("i am here");
                         await Share.share(
                             "${widget.collectionUrl??""}",
                            sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);

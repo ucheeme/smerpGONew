@@ -6,7 +6,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.1.0'
+        classpath 'com.android.tools.build:gradle:8.13.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.google.gms:google-services:4.4.0'
     }
@@ -22,9 +22,25 @@ allprojects {
 rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
-}
-subprojects {
     project.evaluationDependsOn(':app')
+
+    project.plugins.withId("com.android.library") {
+        if (project.extensions.findByName("androidComponents") != null) {
+            project.androidComponents.finalizeDsl { dsl ->
+                if (dsl.compileSdk == null || dsl.compileSdk < 34) {
+                    dsl.compileSdk = 34
+                }
+            }
+        } else {
+            project.afterEvaluate { p ->
+                if (p.hasProperty("android")) {
+                    if (p.android.compileSdk == null || p.android.compileSdk < 34) {
+                        p.android.compileSdk = 34
+                    }
+                }
+            }
+        }
+    }
 }
 
 tasks.register("clean", Delete) {

@@ -230,7 +230,6 @@ class _AddNewProductState extends State<AddNewProduct> {
   }
 
   Future<void> executeCreateProduct(BuildContext context) async {
-       print(_controller.productCostPrice.text);
     if(_controller.productCostPrice.text.isEmpty||
         _controller.productSellingPrice.text.isEmpty||
     _controller.productQuantity.text.isEmpty||

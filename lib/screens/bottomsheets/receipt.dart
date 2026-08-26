@@ -26,6 +26,7 @@ import 'package:intl/intl.dart';
 import 'package:screenshot/screenshot.dart';
 // import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
 import 'package:smerp_go/screens/bottomsheets/customerReceipt.dart';
 import 'package:smerp_go/screens/bottomsheets/downloadFormat.dart';
 import 'package:smerp_go/utils/downloadAsImage.dart';
@@ -80,9 +81,8 @@ class _ReceiptInAppState extends State<ReceiptInApp> {
 @override
   void initState() {
   customersName=  widget.customerName??"";
-  print("this is the customerName:${widget.customerName}");
   paymentStatus = widget.paymentStatus??"";
-  print("this is the payment=${widget.paymentStatus}");
+  AppLogger.debug('Receipt screen opened isOrder=${widget.isOrder}', tag: 'Receipt');
   if(widget.isOrder){
     getOrderDetails();
   }else{
@@ -106,7 +106,6 @@ class _ReceiptInAppState extends State<ReceiptInApp> {
         _controller.prodUnitName = saleListInfo[0].saleProducts[0].productUnitCategory;
         _controller.editTotalSaleCost = saleListInfo[0].saleProducts[0].salesAmount;
         paymentStatus = saleListInfo[0].saleProducts[0].paymentStatus;
-        print("the payment is: $paymentStatus");
        _controller.paymentStatus.value = _controller.paymentStatusid(paymentStatus);
         _controller.qty = saleListInfo[0].saleProducts[0].quantity;
         (widget.customerName==null)? saleListInfo[0].customerName : widget.customerName!;
@@ -116,10 +115,9 @@ class _ReceiptInAppState extends State<ReceiptInApp> {
         setState(() {
           customersName =(widget.customerName==null)? saleListInfo[0].customerName :widget.customerName!;
         });
-        print("user name is $customersName");
        // _controller.paymentStatus.value=_controller.paymentStatusid(saleListInfo[0].saleProducts[0].paymentStatus);
         _controller.paymentStatus.value=_controller.paymentStatusid(paymentStatus);
-        print("user name payment status is ${saleListInfo[0].saleProducts[0].paymentStatus}");
+        AppLogger.debug('Receipt loaded ${saleListInfo[0].saleProducts.length} line items', tag: 'Receipt');
         totalAmount = 0;
         for (var element in saleListInfo[0].saleProducts) {
           setState(() {
@@ -675,7 +673,7 @@ class _ReceiptInAppState extends State<ReceiptInApp> {
           )),
         )
     ).then((value)async{
-      print(value.runtimeType);
+      AppLogger.debug('Receipt share completed type=${value.runtimeType}', tag: 'Receipt');
       if (value != null) {
         final directory = await getApplicationDocumentsDirectory();
         final imagePath = await File('${directory.path}/image.png').create();
@@ -727,7 +725,7 @@ class _ReceiptInAppState extends State<ReceiptInApp> {
       setState(() {
         customersName =orderInformation!.buyer.name;
       });
-      print("user name is $customersName");
+      AppLogger.debug('Order receipt loaded ${orderInformation!.items.length} items', tag: 'Receipt');
      totalAmount = 0;
       for (var element in orderInformation!.items) {
         setState(() {

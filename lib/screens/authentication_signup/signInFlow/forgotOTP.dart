@@ -65,7 +65,6 @@ class _ForgotOTPState extends State<ForgotOTP> {
                             onTap: (String value) {
                               setState(
                                     () {
-                                  print("a test");
                                   _controller.otpValueOTP.value = value;
                                   _controller.otplengthOTP.value =
                                       value.length;

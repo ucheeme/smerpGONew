@@ -9,6 +9,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/routes/transitions_type.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
 import 'package:smerp_go/screens/bottomNav/screens/inventory/allIProductd.dart';
 
 import '../../../../controller/catalogueController.dart';
@@ -56,8 +57,7 @@ class _CatalogDesignViewState extends State<CatalogDesignView> {
   bool isOff= false;
   @override
   void initState() {
-    print("init is called ");
-    print(widget.mockData.length);
+    AppLogger.debug('CatalogDesignView init count=${widget.mockData.length}', tag: 'Catalogue');
     catalogs.value = widget.mockData;
     isSwitched = widget.isSwitched!;
 
@@ -113,6 +113,12 @@ void categoryLength(String categoryName)async {
   RefreshController refreshController =
   RefreshController(initialRefresh: false);
   var b = "ahh";
+
+  @override
+  void dispose() {
+    refreshController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +192,7 @@ void categoryLength(String categoryName)async {
                                       // publishUpdated.value = true;
                                      });
                                    } else {
-                                     print("this is false $res");
+                                     AppLogger.debug('Catalog visibility updated result=$res', tag: 'Catalogue');
                                      setState(() {
                                        isSwitched = initialValue;
                                       // publishUpdated.value = true;
@@ -230,7 +236,7 @@ void categoryLength(String categoryName)async {
                                 duration: Duration(seconds: 1),
                                 // curve: Curves.bounceIn,
                                 transition: Transition.cupertino)?.whenComplete(() {
-                                  print("called");
+                                  AppLogger.debug('Catalog publish toggled', tag: 'Catalogue');
                               getCatalogCall();
                               setState(() {
                               });
@@ -410,7 +416,7 @@ void categoryLength(String categoryName)async {
         {
           bool res = await _controller.updateCatalogAllProduct(value);
           if (res) {
-            print("this is true $res");
+            AppLogger.debug('Catalog visibility updated result=$res', tag: 'Catalogue');
             setState(() {
               // widget.isSwitched= res;
               isSwitched = value;
@@ -431,7 +437,7 @@ void categoryLength(String categoryName)async {
           // bool initialValue = value;
           bool res = await _controller.updateCatalogAllProductCata(value, 1);
           if (res) {
-            print("this is the catalog length ${catalogs.length}");
+            AppLogger.debug('Catalog list length=${catalogs.length}', tag: 'Catalogue');
             setState(() {
               widget.isSwitched = value;
               isSwitched = value;
@@ -459,7 +465,7 @@ void categoryLength(String categoryName)async {
           // bool initialValue = value;
           bool res = await _controller.updateCatalogAllProductCata(value, 2);
           if (res) {
-            print("this is true $res");
+            AppLogger.debug('Catalog visibility updated result=$res', tag: 'Catalogue');
             setState(() {
               widget.isSwitched = value;
               isSwitched = value;
@@ -485,7 +491,7 @@ void categoryLength(String categoryName)async {
           // bool initialValue = value;
           bool res = await _controller.updateCatalogAllProductCata(value, 4);
           if (res) {
-            print("this is true $res");
+            AppLogger.debug('Catalog visibility updated result=$res', tag: 'Catalogue');
             setState(() {
               widget.isSwitched= value;
               isSwitched = value;
@@ -512,7 +518,7 @@ void categoryLength(String categoryName)async {
 
           bool res = await _controller.updateCatalogAllProductCata(value, 5);
           if (res) {
-            print("this is true $res");
+            AppLogger.debug('Catalog visibility updated result=$res', tag: 'Catalogue');
             setState(() {
               widget.isSwitched= value;
               isSwitched = value;
@@ -536,7 +542,7 @@ void categoryLength(String categoryName)async {
         {
           bool res = await _controller.updateCatalogAllProductCata(value, 7);
           if (res) {
-            print("this is true $res");
+            AppLogger.debug('Catalog visibility updated result=$res', tag: 'Catalogue');
             setState(() {
               widget.isSwitched= value;
               isSwitched = value;
@@ -562,7 +568,7 @@ void categoryLength(String categoryName)async {
 
           bool res = await _controller.updateCatalogAllProductCata(value, 3);
           if (res) {
-            print("this is true $res");
+            AppLogger.debug('Catalog visibility updated result=$res', tag: 'Catalogue');
             setState(() {
               widget.isSwitched= value;
               isSwitched = value;

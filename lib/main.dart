@@ -22,9 +22,6 @@ import 'package:get/get_navigation/src/root/get_material_app.dart';
 // import 'package:ots/ots.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:smerp_go/Reposistory/catalogRepo.dart';
-import 'package:smerp_go/Reposistory/notificationRepo.dart';
-import 'package:smerp_go/Reposistory/orderHistoryCubitRepo/orderHistoryRepo.dart';
 import 'package:smerp_go/apiServiceLayer/firebase_api.dart';
 import 'package:smerp_go/cubit/bankDetail/bank_details_cubit.dart';
 import 'package:smerp_go/cubit/notificationCubit/notification_cubit.dart';
@@ -34,12 +31,17 @@ import 'package:smerp_go/cubit/reportAnalysisDownload/report_analysis_download_c
 
 import 'package:smerp_go/screens/onboarding/splashScreen1.dart';
 
+import 'package:smerp_go/core/logging/app_error_reporter.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
+import 'package:smerp_go/core/repositories/app_repositories.dart';
+import 'package:smerp_go/core/session/credential_storage.dart';
+import 'package:smerp_go/core/session/credential_storage_keys.dart';
+import 'package:smerp_go/core/session/session_manager.dart';
+import 'package:smerp_go/utils/AppUtils.dart';
 import 'package:smerp_go/utils/app_services/httpHelper.dart';
 import 'package:smerp_go/utils/app_services/networkservice.dart';
 
 
-import 'Reposistory/productListRepo.dart';
-import 'Reposistory/reportAnalysisRepo.dart';
 import 'cubit/catalogCubit/catalog_cubit.dart';
 import 'cubit/products/product_cubit.dart';
 import 'firebase_options.dart';
@@ -64,11 +66,11 @@ var remoteConfig;
 
 Future<void> initializeDefaultFromAndroidResource() async {
   if (defaultTargetPlatform != TargetPlatform.android || kIsWeb) {
-    print('Not running on Android, skipping');
+    AppLogger.debug('Not running on Android, skipping', tag: 'Firebase');
     return;
   }
   FirebaseApp app = await Firebase.initializeApp();
-  print('Initialized default app $app from Android resource');
+  AppLogger.debug('Initialized default app $app from Android resource', tag: 'Firebase');
 }
 
 
@@ -78,6 +80,7 @@ Future<void> main() async {
     await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform
     );
+    await AppErrorReporter.initialize();
     FirebaseMessaging messaging = FirebaseMessaging.instance;
     NotificationSettings settings = await messaging.requestPermission(
       alert: true,
@@ -90,15 +93,15 @@ Future<void> main() async {
     );
     Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       await Firebase.initializeApp();
-      print("Handling a background message: ${message.messageId}");
+      AppLogger.debug('Handling background message: ${message.messageId}', tag: 'FCM');
     }
     // Listneing to the foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Got a message whilst in the foreground!');
-      print('Message data: ${message.data}');
+      AppLogger.debug('Foreground FCM message received', tag: 'FCM');
+      AppLogger.debug('Message data keys: ${message.data.keys.toList()}', tag: 'FCM');
 
       if (message.notification != null) {
-        print('Message also contained a notification: ${message.notification}');
+        AppLogger.debug('Message contained notification payload', tag: 'FCM');
       }
     });
 
@@ -109,23 +112,30 @@ Future<void> main() async {
     FirebaseAnalytics.instance.logAppOpen();
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   }on PlatformException {
-    print('Failed to get platform version.');
-  } catch(e) {
-    print("Failed to initialize Firebase: $e");
+    AppLogger.warning('Failed to get platform version.', tag: 'Firebase');
+  } catch(e, trace) {
+    AppLogger.error(e, trace, reason: 'Failed to initialize Firebase', tag: 'Firebase');
   }  // initializeDefaultFromAndroidResource();
   remoteConfig = FirebaseRemoteConfig.instance;
   await remoteConfig.setConfigSettings(RemoteConfigSettings(
     fetchTimeout: const Duration(minutes: 1),
     minimumFetchInterval: const Duration(hours: 1),
   ));
+  await remoteConfig.setDefaults({
+    CredentialStorageKeys.remoteConfigFlag:
+        CredentialStorage.defaultSecureStorageEnabled,
+  });
   await remoteConfig.fetchAndActivate();
+  await SessionManager.restoreSessionFromStorage();
   // deviceMIME= await DeviceImei().getDeviceImei();
 
-  print("This is the device imei:$deviceMIME");
+  AppUtils.debug("Device MIME type: $deviceMIME");
+  if (MyHttpOverrides.isEnabled) {
+    HttpOverrides.global = MyHttpOverrides();
+  }
   runApp( MyApp());
   Get.put < NetworkStatusService > (NetworkStatusService(), permanent: true);
   // EasyLoading.init();
-  HttpOverrides.global = MyHttpOverrides();
   // final _mobileDeviceIdentifier = MobileDeviceIdentifier().getDeviceId();
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
    packageInfo = await PackageInfo.fromPlatform();
@@ -149,7 +159,7 @@ Future<void> main() async {
     deviceModel = info.model!;
     deviceToken = info.localizedModel!;
     deviceType = 2;
-    print("this is the device ID: $deviceId");
+    AppUtils.debug("Device ID initialized");
     //deviceType = info.systemName! + "ios" + info.systemVersion!;
   }
   else if (Platform.isLinux) {
@@ -180,31 +190,14 @@ class _MyApp extends State<MyApp> {
   @override
   void initState() {
     FirebaseMessaging.instance.getToken().then((devToken) {
-     deviceToken = devToken!;
-     print("this is device token: $deviceToken");
+      if (devToken != null) {
+        deviceToken = devToken;
+        AppUtils.debug("FCM device token acquired");
+      }
     });
     super.initState();
-   // _getImei();
-   //_getIMEI();
   }
-  static const platform = const MethodChannel('samples.flutter.dev/imei');
-  String _imeiNumber = 'Unknown';
 
-  // Future<void> _getIMEI() async {
-  //   String imeiNumber;
-  //   try {
-  //     final String result = await platform.invokeMethod('getIMEI');
-  //     imeiNumber = 'IMEI number: $result';
-  //   } on PlatformException catch (e) {
-  //     imeiNumber = "Failed to get IMEI number: '${e.message}'.";
-  //   }
-  //
-  //   setState(() {
-  //     _imeiNumber = imeiNumber;
-  //     deviceMIME=_imeiNumber;
-  //   });
-  //   print("I got the IMEI: $deviceMIME and $_imeiNumber");
-  // }
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
@@ -218,12 +211,24 @@ class _MyApp extends State<MyApp> {
     WidgetsFlutterBinding.ensureInitialized();
     return bloc.MultiBlocProvider(
       providers: [
-        bloc.BlocProvider(create: (BuildContext context) => CatalogCubit( )),
-        bloc.BlocProvider(create: (BuildContext context) => OrderHistoryCubit(orderHistoryRepo: OrderHistoryRepo() )),
-        bloc.BlocProvider(create: (BuildContext context) => CollectionCubit(productListRepo: CollectionRepo() )),
-        bloc.BlocProvider(create: (BuildContext context) => ReportAnalysisDownloadCubit( ReportAnalysisRepo() )),
-        bloc.BlocProvider(create: (BuildContext context) => NotificationCubit(NotificationRepo())),
-        bloc.BlocProvider(create: (BuildContext context) => BankDetailsCubit(CataloRepo())),
+        bloc.BlocProvider(
+            create: (BuildContext context) =>
+                CatalogCubit(catalogRepository: AppRepositories.catalog)),
+        bloc.BlocProvider(
+            create: (BuildContext context) => OrderHistoryCubit(
+                orderHistoryRepo: AppRepositories.orderHistory)),
+        bloc.BlocProvider(
+            create: (BuildContext context) => CollectionCubit(
+                productListRepo: AppRepositories.collection)),
+        bloc.BlocProvider(
+            create: (BuildContext context) =>
+                ReportAnalysisDownloadCubit(AppRepositories.reportAnalysis)),
+        bloc.BlocProvider(
+            create: (BuildContext context) =>
+                NotificationCubit(AppRepositories.notification)),
+        bloc.BlocProvider(
+            create: (BuildContext context) =>
+                BankDetailsCubit(AppRepositories.bankDetails)),
       ],
       child: ScreenUtilInit(
         designSize: Size(430, 954),
@@ -233,11 +238,9 @@ class _MyApp extends State<MyApp> {
           return  GetMaterialApp(
                 title: 'Smerpgo',
                 initialRoute: '/',
-                getPages: [GetPage(name: '/', page: () =>
-                    SplashScreen())],
+                getPages: [GetPage(name: '/', page: () => SplashScreen())],
                 debugShowCheckedModeBanner: false,
              //  theme: Get.theme
-
             );
         },
 

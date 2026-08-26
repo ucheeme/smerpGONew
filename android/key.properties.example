@@ -1,0 +1,25 @@
+# Release signing for Play Store / production APK or AAB builds.
+#
+# Setup (one-time):
+#   1. Copy this file to key.properties in this same directory (android/):
+#        cp key.properties.example key.properties
+#   2. Generate a keystore (skip if you already have one from Play App Signing):
+#        mkdir -p keystore
+#        keytool -genkeypair -v \
+#          -storetype PKCS12 \
+#          -keystore keystore/upload-keystore.jks \
+#          -alias upload \
+#          -keyalg RSA -keysize 2048 -validity 10000
+#   3. Fill in the values below.
+#   4. Build release:
+#        flutter build appbundle --release
+#
+# Or run the interactive helper:
+#   ./setup_release_signing.sh
+#
+# NEVER commit key.properties or *.jks to git (already in .gitignore).
+
+storePassword=your-store-password
+keyPassword=your-key-password
+keyAlias=upload
+storeFile=keystore/upload-keystore.jks

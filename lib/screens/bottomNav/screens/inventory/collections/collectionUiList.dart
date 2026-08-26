@@ -12,6 +12,8 @@ import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:smerp_go/controller/collection.dart';
+import 'package:smerp_go/core/cache/app_list_cache.dart';
+import 'package:smerp_go/core/cache/app_list_cache_keys.dart';
 import 'package:smerp_go/model/collectionDetail.dart';
 import 'package:smerp_go/screens/bottomNav/screens/inventory/collections/collectionDetails.dart';
 import 'package:smerp_go/utils/appColors.dart';
@@ -45,7 +47,8 @@ class _CollectionHomeState extends State<CollectionHome> {
   List<CollectionList> collectionList = [];
 @override
   void initState() {
-  if(collectionListTemp.isNotEmpty){
+  if(collectionListTemp.isNotEmpty &&
+      AppListCache.isFresh(AppListCacheKeys.collections)){
     collectionList=collectionListTemp;
   }
     super.initState();
@@ -56,6 +59,13 @@ class _CollectionHomeState extends State<CollectionHome> {
 //     refreshController.dispose();
 //     super.dispose();
 //   }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    refreshController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +87,7 @@ class _CollectionHomeState extends State<CollectionHome> {
           _collectionController.collectionList = state.response??[];
           collectionList = state.response??[];
           collectionListTemp = state.response??[];
+          AppListCache.markFresh(AppListCacheKeys.collections);
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (isRefresh) {
               refreshController.refreshCompleted();
@@ -88,7 +99,6 @@ class _CollectionHomeState extends State<CollectionHome> {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (isMoreAction) {
               isMoreAction = false;
-              print("hurrayyy");
               Get.bottomSheet(
                   Container(
                       height: 350.h,
@@ -100,7 +110,6 @@ class _CollectionHomeState extends State<CollectionHome> {
                         collectionUrl: collectionUrl,))
               );
             } else {
-              print("wawu");
               Get.to(
                   CollectionDetaiUI(
                     collectionDetail: state.response,

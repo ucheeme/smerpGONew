@@ -90,8 +90,6 @@ class _UnitOfMeasurementState extends State<UnitOfMeasurement> {
                             CreateCustomUnitOfMeasurement());
                         if(response){
                           getProduCateCall();
-                        }else{
-                          print("failed");
                         }
                       },
                       child: Icon(Icons.add_circle))
@@ -161,6 +159,12 @@ class _UnitOfMeasurementState extends State<UnitOfMeasurement> {
     setState(() {
       prodCategory = prodCategory;
     });
+  }
+
+  @override
+  void dispose() {
+    refreshController.dispose();
+    super.dispose();
   }
 }
 

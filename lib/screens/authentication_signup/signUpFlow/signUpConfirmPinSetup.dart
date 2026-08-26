@@ -88,7 +88,6 @@ class _SignUpConfirmPinState extends State<SignUpConfirmPin> {
                             gapHeight(65.h),
                             GestureDetector(
                               onTap: () {
-                                print("this is first:${widget.pin}");
                                 if(widget.pin==_controller.otpValue){
                                   Get.snackbar("PIN SETUP FAILED",
                                     "Pin does not match",

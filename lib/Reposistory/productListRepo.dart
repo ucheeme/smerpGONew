@@ -13,8 +13,9 @@ import '../model/response/product/productList.dart';
 import '../utils/UserUtils.dart';
 import '../utils/appUrl.dart';
 import 'apiRepo.dart';
+import 'package:smerp_go/core/repositories/i_collection_repository.dart';
 
-class CollectionRepo extends ApiRepository{
+class CollectionRepo extends ApiRepository implements ICollectionRepository{
   Future<Object> getProductList()async{
     var response = await ApiService.makeApiCall(null,AppUrls().getProductInventory,
         method: HTTP_METHODS.get);
@@ -22,16 +23,15 @@ class CollectionRepo extends ApiRepository{
     if(r is DefaultApiResponse){
       if(r.isSuccess){
        List<InventoryInfo> res = productListFromJson(json.encode(r.data));
-        print("response here:${res.length}");
-        print("response here:${res.runtimeType}");
+        logRepoSuccess('getProductList', count: res.length);
         return res;
       }else{
-        print("failed response here:${r}");
+        logRepoFailure('getProductList', r);
         return r;
       }
     }
     else{
-      print("failed2 response here:${r}");
+      logRepoFailure('getProductList', r);
       handleErrorResponse(response);
       return errorResponse!;
     }
@@ -45,14 +45,15 @@ class CollectionRepo extends ApiRepository{
     if (r is DefaultApiResponse) {
       if (r.isSuccess) {
         CollectionDetail res = collectionDetailFromJson(json.encode(r.data));
+        logRepoSuccess('getCollectionDetail');
         return res;
       } else {
-        print("failed response here:${r}");
+        logRepoFailure('getCollectionDetail', r);
         return r;
       }
     }
     else {
-      print("failed2 response here:${r}");
+      logRepoFailure('getCollectionDetail', r);
       handleErrorResponse(response);
       return errorResponse!;
     }
@@ -62,22 +63,20 @@ class CollectionRepo extends ApiRepository{
     var response = await ApiService.makeApiCall(null,AppUrls().getUserCollections(merchantCode),
         method: HTTP_METHODS.get);
     var r =  handleSuccessResponse(response);
-    print(r.runtimeType);
     if(r is DefaultApiResponse){
       if(r.isSuccess){
         List<CollectionList> res = collectionListFromJson(json.encode(r.data));
-        print("response here:${res?.length}");
-        print("response here:${res.runtimeType}");
+        logRepoSuccess('getCollectionList', count: res?.length);
         return res??[];
       }else if(!r.isSuccess){
         List<CollectionList> res=[];
         return res;
       }else{
-        print("failed response here:${r}");
+        logRepoFailure('getCollectionList', r);
         return [];
       }
     } else{
-      print("failed2 response here:${r}");
+      logRepoFailure('getCollectionList', r);
       handleErrorResponse(response);
       return errorResponse!;
     }
@@ -100,9 +99,10 @@ class CollectionRepo extends ApiRepository{
     var r =  handleSuccessResponse(response);
     if(r is DefaultApiResponse){
       CollectionCreatedResponse res = collectionResponseFromJson(json.encode(r.data));
+      logRepoSuccess('createCollection');
       return res;
     }else{
-      print("failed response here:${r}");
+      logRepoFailure('createCollection', r);
       return r;
     }
     }
@@ -124,14 +124,15 @@ class CollectionRepo extends ApiRepository{
     var r =  handleSuccessResponse(response);
     if(r is DefaultApiResponse){
       if(r.isSuccess){
+        logRepoSuccess('updateCollection');
         return r;
       }else{
-        print("failed response here:${r}");
+        logRepoFailure('updateCollection', r);
         return r;
       }
     }
     else{
-      print("failed2 response here:${r}");
+      logRepoFailure('updateCollection', r);
       handleErrorResponse(response);
       return errorResponse!;
     }
@@ -146,14 +147,15 @@ class CollectionRepo extends ApiRepository{
     var r =  handleSuccessResponse(response);
     if(r is DefaultApiResponse){
       if(r.data==null&& r.isSuccess){
+        logRepoSuccess('deleteCollection');
         return r;
       }else{
-        print("failed response here:${r}");
+        logRepoFailure('deleteCollection', r);
         return r;
       }
     }
     else{
-      print("failed2 response here:${r}");
+      logRepoFailure('deleteCollection', r);
       handleErrorResponse(response);
       return errorResponse!;
     }

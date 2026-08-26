@@ -76,7 +76,6 @@ class _ValidateNewDeviceState extends State<ValidateNewDevice> {
                             onTap: (String value) {
                               setState(
                                     () {
-                                  print("a test");
                                   accountVerificationController.otpValue.value =
                                       value;
                                   accountVerificationController.otplength

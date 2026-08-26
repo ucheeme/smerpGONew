@@ -1,3 +1,4 @@
+import 'package:smerp_go/core/logging/app_logger.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -211,7 +212,6 @@ class _AddSaleEditProdState extends State<AddSaleEditProd> {
                                   setState(() {
                                     _controller.totalAmount = _controller.totalAmount+ ( _controller.qtyList[element]* _controller.prAddList[element].data.sellingPrice);
                                   });
-                                  print("the total:${_controller.totalAmount}");
                                 }
                               }
                               if(widget.isUpdate){

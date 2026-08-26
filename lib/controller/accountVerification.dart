@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
 import 'package:smerp_go/model/request/signUpTokenValidation.dart';
 
 import '../Reposistory/apiRepo.dart';
@@ -62,8 +63,7 @@ class AccountVerificationController extends GetxController{
             colorText: Colors.white,);
         }
       }catch(e, trace){
-        print(e);
-        print(trace);
+        AppLogger.error(e, trace, reason: 'accountVerification', tag: 'AccountVerification');
         isLoading.value = false;
       }
     } else{
@@ -105,8 +105,7 @@ class AccountVerificationController extends GetxController{
             colorText: Colors.white,);
         }
       }catch(e, trace){
-        print(e);
-        print(trace);
+        AppLogger.error(e, trace, reason: 'accountVerification', tag: 'AccountVerification');
         isLoading.value = false;
       }
     }else{

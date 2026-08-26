@@ -9,11 +9,12 @@ import 'package:smerp_go/screens/bottomNav/screens/inventory/viewProduct.dart';
 
 import '../../../../controller/inventoryController.dart';
 import '../../../../model/response/inventoryList.dart';
-import '../../../../utils/AppUtils.dart';
 import '../../../../utils/appColors.dart';
 import '../../../../utils/appDesignUtil.dart';
 import '../../../../utils/mockdata/mockInventoryData.dart';
 import '../../../../utils/mockdata/tempData.dart';
+import 'package:smerp_go/core/cache/app_list_cache.dart';
+import 'package:smerp_go/core/cache/app_list_cache_keys.dart';
 import '../../../bottomsheets/dashboardFilterOption.dart';
 import 'editProduct.dart';
 
@@ -33,7 +34,7 @@ class _AllProductsState extends State<AllProducts> {
       initialRefresh: false);
 
   void getInventoryCall() async {
-    if (isInventoryListHasRun == false) {
+    if (!AppListCache.hasLoaded(AppListCacheKeys.inventory)) {
       loading = true;
     }
     inventoryList = await _controllerInventory.allInventorylist();
@@ -49,7 +50,7 @@ class _AllProductsState extends State<AllProducts> {
         }
       });
     });
-    isInventoryListHasRun = true;
+    AppListCache.setHasLoaded(AppListCacheKeys.inventory, true);
   }
   RefreshController refreshController2 = RefreshController(initialRefresh: false);
 
@@ -57,11 +58,18 @@ class _AllProductsState extends State<AllProducts> {
   void initState() {
     // _bankChoose = mockProductData[0];
     super.initState();
-    if (!isInventoryListHasRun) {
-      getInventoryCall();
-    } else {
+    if (AppListCache.shouldServeKey(AppListCacheKeys.inventory)) {
       inventoryList = inventoryListTemp;
+    } else {
+      getInventoryCall();
     }
+  }
+
+  @override
+  void dispose() {
+    refreshController.dispose();
+    refreshController2.dispose();
+    super.dispose();
   }
 
   @override

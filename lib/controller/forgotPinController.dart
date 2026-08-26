@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
+import 'package:smerp_go/core/session/credential_storage.dart';
 import 'package:smerp_go/model/response/defaultApiResponse.dart';
 
 import '../Reposistory/apiRepo.dart';
@@ -81,8 +83,7 @@ class ForgotPinController extends GetxController{
           isLoading.value = false;
         }
       } catch (e, trace) {
-        print(e);
-        print(trace);
+        AppLogger.error(e, trace, reason: 'forgotPinOtp', tag: 'ForgotPin');
         isLoading.value = false;
       }
     }else{
@@ -111,7 +112,6 @@ class ForgotPinController extends GetxController{
       //var service = ApiService();
       var response = await ApiService.makeApiCall(signUpPin,
           AppUrls.resetPin, requireAccess: false);
-      print(response);
 
       if (response is Success) {
         try {
@@ -120,7 +120,7 @@ class ForgotPinController extends GetxController{
 
           if (data.isSuccess) {
             isLoading.value = false;
-            SharedPref.save("userPin", forgotConfirmPinSetUp.text);
+            await CredentialStorage.savePin(forgotConfirmPinSetUp.text);
             Get.bottomSheet(Container(
                 height: 445.h,
                 child: PinCreationCreationSuccessful()),
@@ -133,8 +133,7 @@ class ForgotPinController extends GetxController{
               colorText: Colors.white,);
           }
         } catch (e, trace) {
-          print(e);
-          print(trace);
+          AppLogger.error(e, trace, reason: 'setPinStepTwo', tag: 'ForgotPin');
           isLoading.value = false;
         }
       }else{
@@ -185,8 +184,7 @@ class ForgotPinController extends GetxController{
             colorText: Colors.white,);
         }
       } catch (e, trace) {
-        print(e);
-        print(trace);
+        AppLogger.error(e, trace, reason: 'forgotPinOtp', tag: 'ForgotPin');
         isLoading.value = false;
       }
     } else {
@@ -195,4 +193,15 @@ class ForgotPinController extends GetxController{
       repo.handleErrorResponse(response);
     }
   }
+
+  @override
+  void onClose() {
+    pinValueController.dispose();
+    setForgotPinPhoneNumber.dispose();
+    setForgotPinEmailAddress.dispose();
+    forgotPinSetUp.dispose();
+    forgotConfirmPinSetUp.dispose();
+    pinValueControllerOTP.dispose();
+    super.onClose();
   }
+}

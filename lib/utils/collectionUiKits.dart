@@ -22,6 +22,8 @@ import 'AppUtils.dart';
 import 'appColors.dart';
 import 'downloadAsImage.dart';
 import 'mockdata/tempData.dart';
+import 'package:smerp_go/core/cache/app_list_cache.dart';
+import 'package:smerp_go/core/cache/app_list_cache_keys.dart';
 
 enum  InventoryOptions {Inventory, Collection}
 
@@ -262,6 +264,7 @@ class _CollectionMoreActionsState extends State<CollectionMoreActions> {
       if(state is CollectionListSuccessState){
        _collectionController.collectionList = state.response??[];
         collectionListTemp=  _collectionController.collectionList;
+        AppListCache.markFresh(AppListCacheKeys.collections);
         WidgetsBinding.instance.addPostFrameCallback((_) {
         });
       }
@@ -611,7 +614,6 @@ class _ShareCollectionUIState extends State<ShareCollectionUI> {
               onTap: ()async {
                 final box = context.findRenderObject()
                 as RenderBox;
-                print("i am here");
                 await Share.share(
                     widget.collectionUrl,
                     sharePositionOrigin:

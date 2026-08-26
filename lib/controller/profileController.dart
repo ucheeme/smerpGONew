@@ -10,6 +10,7 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:smerp_go/apiServiceLayer/api_status.dart';
 import 'package:smerp_go/model/response/defaultApiResponse.dart';
+import 'package:smerp_go/core/session/session_manager.dart';
 import 'package:smerp_go/model/response/userProfileInfoe.dart';
 import 'package:smerp_go/model/response/validateOtp.dart';
 import 'package:smerp_go/screens/bottomsheets/phoneEmailChangeSuccessFul.dart';
@@ -307,32 +308,10 @@ return false;
         var data = defaultApiResponseFromJson(await response.response as String);
         if(data.isSuccess && data.data == null){
           isLoading.value = false;
-          productCategoryList =[];
-          productUnitCategoryList =[];
-          inventoryListTemp =[];
-          catalogListTemp =[];
-          catalogsFTemp = [];
-          saleListTemp=[];
-          actionBy = "";
-          inventoryId="";
-          userImage ="".obs;
-          isLoading.value=false;
-          isSignUpViaPhone.value =true;
-          userIdentityValue=null;
-          identitySource = null;
-          otpCreateAccout= "";
-          userName= "";
-          userBusinessName.value="";
-          userEmail= "";
-          userMerchantCode="";
-          loginData=null;
-          isProductCategoryHasRun = Rx(false);
-          isProductUnitCategoryHasRun = Rx(false);
-          isInventoryListHasRun =false;
-          isSalesListHasRun = Rx(false);
-          isCatalogListHasRun = Rx(false);
-          saleIsEmpty= RxBool(false);
-          productIsEmpty= RxBool(false);
+          await SessionManager.clearSession();
+          if (!context.mounted) {
+            return true;
+          }
           Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
@@ -359,5 +338,15 @@ return false;
     return false;
   }
 
-
+  @override
+  void onClose() {
+    firstName.dispose();
+    otherNames.dispose();
+    storeName.dispose();
+    storeEmail.dispose();
+    storePhone.dispose();
+    storeMerchantCode.dispose();
+    errorController.close();
+    super.onClose();
+  }
 }

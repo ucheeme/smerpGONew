@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:overlay_loader_with_app_icon/overlay_loader_with_app_icon.dart';
 import 'package:smerp_go/controller/signInController.dart';
+import 'package:smerp_go/core/session/credential_storage.dart';
 import 'package:smerp_go/utils/AppUtils.dart';
 import 'package:smerp_go/utils/UserUtils.dart';
 import 'package:smerp_go/utils/appColors.dart';
@@ -54,9 +55,11 @@ class _AccountCreationSuccessfulState extends State<AccountCreationSuccessful> {
               GestureDetector(
                 onTap: () async {
                   actionBy="";
-                  String e = await SharedPref.read("userPin");
-                  String pin = e.substring(1, e.length - 1);
-                  SharedPref.save("userId", userIdentityValue!);
+                  final pin = await CredentialStorage.readPin();
+                  if (pin == null || userIdentityValue == null) {
+                    return;
+                  }
+                  await SharedPref.save("userId", userIdentityValue!);
                  _controller.loginUser(userIdentityValue!, pin);
                   Get.back();
                 },

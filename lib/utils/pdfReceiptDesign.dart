@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
 import 'package:smerp_go/cubit/bankDetail/bank_details_cubit.dart';
 
 import '../model/response/order/orderDetails.dart';
@@ -19,8 +20,6 @@ import 'appColors.dart';
 import 'appDesignUtil.dart';
 
 List<SalesItemInfo> splitSaleListData(List<SalesItemInfo> data, int parts,int position){
-  List<int> count = [1,2,3,4,5,6,7,8,9];
-  print("this is sublist: ${count.sublist(0,4)} and ${count.sublist(4,count.length)}");
   if(data.length>4){
     position = 3;
     if(parts==1) {
@@ -35,8 +34,6 @@ List<SalesItemInfo> splitSaleListData(List<SalesItemInfo> data, int parts,int po
 
 }
 List<OrderItems> splitOrderListData(List<OrderItems> data, int parts,int position){
-  List<int> count = [1,2,3,4,5,6,7,8,9];
-  print("this is sublist: ${count.sublist(0,3)} and ${count.sublist(4,count.length)}");
   if(data.length>4){
     position = 3;
     if(parts==1) {
@@ -50,20 +47,15 @@ List<OrderItems> splitOrderListData(List<OrderItems> data, int parts,int positio
 }
 int positionSet (List<SalesItemInfo> data,) {
   if (data.length.isLowerThan(4)) {
-
-    print("${data.length} list is lower than 4");
     return 0;
   } else {
-    print("list is more than 4");
     return 3;
   }
 }
 int positionSetOrder (List<OrderItems> data,){
   if(data.length.isLowerThan(4)){
-    print("Order list is lower than 4");
     return 0;
   }else{
-    print("Order list is more than 4");
     return 3;
   }
 }
@@ -86,7 +78,7 @@ Future<Uint8List> generate2Pdf(PdfPageFormat format,{int? paymentStatus,
       lentth=6;
     }
   }else{
-    print(data[0].saleProducts.length);
+    AppLogger.debug('PDF sale products count=${data[0].saleProducts.length}', tag: 'Receipt');
     position = positionSet(data[0].saleProducts);
     if(position==0){
       lentth = data[0].saleProducts.length;
@@ -232,8 +224,7 @@ Future<Uint8List> generate2Pdf(PdfPageFormat format,{int? paymentStatus,
                                   itemBuilder: (context, index){
                                     var items =(isOrder)? newValueOrders![index]:null;
                                     var currentData=(isOrder)?null: newValueSales![index];
-                                    (isOrder)?print("This is the order value for index:$index => ${ newValueOrders![index].name}"):
-                                    print("This is the sales value for index:$index => ${newValueSales![index].productName}");
+                                    AppLogger.debug('PDF line item index=$index isOrder=$isOrder', tag: 'Receipt');
                                     return (isOrder)?
                                     pw.Row(
                                       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,

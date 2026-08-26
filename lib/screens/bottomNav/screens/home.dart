@@ -9,6 +9,9 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
+import 'package:smerp_go/core/cache/app_list_cache.dart';
+import 'package:smerp_go/core/cache/app_list_cache_keys.dart';
 import 'package:smerp_go/controller/orderController.dart';
 import 'package:smerp_go/cubit/bankDetail/bank_details_cubit.dart';
 import 'package:smerp_go/screens/bottomNav/screens/orders/allOrders.dart';
@@ -70,19 +73,25 @@ late BankDetailsCubit cubit;
 
     super.initState();
 
-    if (!isSalesListHasRun.value) {
-      getSaleCall();
-      dashboardApi();
-    } else {
+    if (AppListCache.shouldServeKey(AppListCacheKeys.sales)) {
       setState(() {
         //   _controllerDashboard.saleList = saleListTemp;
      });
+    } else {
+      getSaleCall();
     }
   }
+
+  @override
+  void dispose() {
+    refreshController.dispose();
+    super.dispose();
+  }
+
 Future<void> newFeatureAvailable()async {
   if(Platform.isAndroid){
     bool response =await remoteConfig.getBool("newFeatureAdded");
-    print("the response $response");
+    AppLogger.debug('newFeatureAdded remote config: $response', tag: 'Home');
     if(response) {
      //  Get.bottomSheet(
      //      Container(
@@ -106,7 +115,7 @@ Future<void> newFeatureAvailable()async {
     }
   }else if(Platform.isIOS){
     bool response =await remoteConfig.getBool("newFeatureAdded");
-    print("the response ios $response");
+    AppLogger.debug('newFeatureAdded remote config (iOS): $response', tag: 'Home');
     if(response){
       showCupertinoModalBottomSheet(
           context: context,
@@ -138,7 +147,7 @@ Future<void> newFeatureAvailable()async {
   bool obscurePassword = true;
 
   void getSaleCall() async {
-    if (isSalesListHasRun.value == false) {
+    if (!AppListCache.hasLoaded(AppListCacheKeys.sales)) {
       // loading = true;
     }
     _controllerDashboard.saleList = await _controllerDashboard.allSaleList();
@@ -154,7 +163,7 @@ Future<void> newFeatureAvailable()async {
         }
       });
     });
-    isSalesListHasRun.value = true;
+    AppListCache.setHasLoaded(AppListCacheKeys.sales, true);
   }
 
   @override
@@ -314,7 +323,6 @@ Future<void> newFeatureAvailable()async {
                             padding: EdgeInsets.only(left: 16.w, right: 16.w),
                             child: GestureDetector(
                               onTap: () {
-                                print(DateTime.now());
                                 Get.to(
                                   AddNewSale(),
                                   duration: Duration(seconds: 1),
@@ -532,7 +540,6 @@ Future<void> newFeatureAvailable()async {
                                                                       subsetList[index],
                                                                 ));
                                                           }).whenComplete(() {
-                                                        print("Im done");
                                                         setState(() {
                                                           _controllerDashboard
                                                                   .saleList =

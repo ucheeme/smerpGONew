@@ -31,8 +31,6 @@ class _DateRangePickerState extends State<DateRangePicker> {
       //   final PickerDateRange range = args.value!;
         startDate = args.value.startDate;
         endDate = args.value.endDate;
-        print("this is the ${DateFormat('dd-MM-yyyy').format(startDate!)} &"
-            " ${DateFormat('dd-MM-yyyy').format(endDate!)}");
       startDateController.text=DateFormat('dd-MMM-yyyy').format(startDate!);
       endDateController.text= DateFormat('dd-MMM-yyyy').format(endDate!);
     });
@@ -151,7 +149,6 @@ class _DateRangePickerState extends State<DateRangePicker> {
                     child: GestureDetector(
                       onTap: (){
                          Get.back(result:[startDate, endDate] );
-                        print("Start: $startDate and End: $endDate" );
                       },
                       child: Container(
                         height: 50.h,

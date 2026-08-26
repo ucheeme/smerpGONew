@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:smerp_go/core/logging/app_logger.dart';
 import '../../controller/signInController.dart';
 import '../../main.dart';
 import '../../utils/AppUtils.dart';
@@ -85,15 +86,12 @@ class _SplashscreenState extends State<Splashscreen> {
 
                               if(await SharedPref.getBool("keepUserInfo")){
                                 String res = await SharedPref.read("userFirstName");
-                                String a = await   SharedPref.read("userImage");
+                                String a = await SharedPref.read("userImage");
                                 String e = await SharedPref.read("userIdentityValue");
-                                print(res);
-                                print(a);
-                                print(e);
                                 userIdentityValue =  e.substring(1,e.length-1);
                                 _controller.storeName.value =  res.substring(1,res.length-1);
                                 userImage.value =a.substring(1,a.length-1);
-                                print(userImage.value);
+                                AppLogger.debug('Returning user login flow', tag: 'Splash');
                                 Get.to(SignIn(),
                                   duration: Duration(seconds: 1),
                                   //  curve: Curves.easeIn,
@@ -139,8 +137,7 @@ class _SplashscreenState extends State<Splashscreen> {
       }
     }else if(Platform.isIOS){
       var response =await remoteConfig.getString("iosVersion");
-      print("The old version:$response");
-      print("The new version:${removeLastDigit(packageInfo!.version)}");
+      AppLogger.debug('Android remote version: $response current: ${removeLastDigit(packageInfo!.version)}', tag: 'Splash');
       int currentVersion= int.parse(removeLastDigit(packageInfo!.version));
       int remoteVersion= int.parse(removeLastDigit(response));
       if(currentVersion < remoteVersion){

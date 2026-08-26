@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
 
 import '../controller/report.dart';
 import 'appColors.dart';
@@ -78,7 +79,7 @@ class _BestProductTabState extends State<BestProductTab>
                 activeTab4 = false;
                 _controller.performingPeriod?.value=1;
               });
-              print("this is last week");
+              AppLogger.debug('Best product tab: last week', tag: 'Report');
               _controller.bestPerformingProductList.value= _controller.performingAnalysis!.lastWeek;
               _controller.bestPerformingProductList.value.sort((a,b)=>b.count.compareTo(a.count));
               tabController?.animateTo(1,

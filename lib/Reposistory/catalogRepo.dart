@@ -9,8 +9,9 @@ import '../model/response/createBankDetailResponse.dart';
 import '../model/response/defaultApiResponse.dart';
 import '../model/response/notificationList.dart';
 import '../utils/appUrl.dart';
+import 'package:smerp_go/core/repositories/i_bank_details_repository.dart';
 
-class CataloRepo extends ApiRepository{
+class CataloRepo extends ApiRepository implements IBankDetailsRepository{
   Future<Object> getCatologList()async{
     var response = await ApiService.makeApiCall(null,AppUrls().getNotificationList,
         method: HTTP_METHODS.get);
@@ -18,16 +19,15 @@ class CataloRepo extends ApiRepository{
     if(r is DefaultApiResponse){
       if(r.isSuccess){
         List<NotificationList> res = notificationListFromJson(json.encode(r.data));
-        print("response here:${res.length}");
-        print("response here:${res.runtimeType}");
+        logRepoSuccess('getCatologList', count: res.length);
         return res;
       }else{
-        print("failed response here:${r}");
+        logRepoFailure('getCatologList', r);
         return r;
       }
     }
     else{
-      print("failed2 response here:${r}");
+      logRepoFailure('getCatologList', r);
       handleErrorResponse(response);
       return errorResponse!;
     }
@@ -40,14 +40,15 @@ class CataloRepo extends ApiRepository{
     if(r is DefaultApiResponse){
       if(r.isSuccess){
         BankDetailReponse res = bankDetailReponseFromJson(json.encode(r.data));
+        logRepoSuccess('getBankDetails');
         return res;
       }else{
-        print("failed response here:${r}");
+        logRepoFailure('getBankDetails', r);
         return r;
       }
     }
     else{
-      print("failed2 response here:${r}");
+      logRepoFailure('getBankDetails', r);
       handleErrorResponse(response);
       return errorResponse!;
     }
@@ -58,10 +59,11 @@ class CataloRepo extends ApiRepository{
         method: HTTP_METHODS.post);
     var r =  handleSuccessResponse(response);
     if(r is DefaultApiResponse){
+       logRepoSuccess('createBankDetails');
        return r;
     }
     else{
-      print("failed2 response here:${r}");
+      logRepoFailure('createBankDetails', r);
       handleErrorResponse(response);
       return errorResponse!;
     }

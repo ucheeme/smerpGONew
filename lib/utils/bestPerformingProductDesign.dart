@@ -7,6 +7,7 @@ import 'package:gap/gap.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
 import 'package:smerp_go/cubit/reportAnalysisDownload/report_analysis_download_cubit.dart';
 import 'package:smerp_go/utils/reportUiKit.dart';
 
@@ -58,7 +59,7 @@ class _BestPerformingProductDesignState
       widget.cubit.resetState();
     }
     if(state is PerformingProductAnalysisSuccess){
-      print("this is the performance for this month: ${state.response.thisMonth}");
+      AppLogger.debug('Best performing products loaded', tag: 'Report');
       _controller.performingAnalysis= state.response;
       performingAnalysis=state.response;
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -141,7 +142,6 @@ class _BestPerformingProductDesignState
                                 itemCount: _controller
                                     .bestPerformingProductList.value.length,
                                 itemBuilder: (context, index) {
-                                  print("the length is ${_controller.bestPerformingProductList.length}");
                                   return Column(
                                     children: [
                                       Container(
@@ -257,6 +257,13 @@ class _BestPerformingProductDesignState
   }
   Future<void> onRefresh()async{
     widget.cubit.getBestPerformingProductReportAnalysis();
+  }
+
+  @override
+  void dispose() {
+    refreshController.dispose();
+    _controller.bestPerformingProductTabController?.dispose();
+    super.dispose();
   }
 }
 

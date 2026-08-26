@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
+import 'package:smerp_go/core/cache/app_list_cache.dart';
+import 'package:smerp_go/core/cache/app_list_cache_keys.dart';
 import 'package:smerp_go/utils/AppUtils.dart';
 import 'package:smerp_go/utils/downloadAsImage.dart';
 
@@ -60,10 +63,11 @@ void checkIfCollectionHasName(){
 
   void getCollectionListInitial(BuildContext context,){
     cubit = context.read<CollectionCubit>();
-    if(collectionListTemp.isEmpty){
-      cubit.getCollectionList();
-    }else {
+    if(collectionListTemp.isNotEmpty &&
+        AppListCache.isFresh(AppListCacheKeys.collections)){
       collectionList = collectionListTemp;
+    }else {
+      cubit.getCollectionList();
     }
   }
 
@@ -79,9 +83,7 @@ void checkIfCollectionHasName(){
 
     }
    assignedCollection(isUpdateProductCollection, collectionProductIds);
-    print("this is length for inventory:${inventory.length}");
-    print("this is length for selectionBool:${selectedProductOptions}");
-    print("this is the id for product in here:$collectionProductIds");
+    AppLogger.debug('Collection inventory count=${inventory.length} selected=${selectedProductOptions.length}', tag: 'Collection');
   }
 
   void assignedCollection(bool isUpdateProductCollection, List<int>? collectionProductIds) {

@@ -8,9 +8,10 @@ import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:smerp_go/apiServiceLayer/api_status.dart';
 import 'package:smerp_go/main.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
 import 'package:smerp_go/model/request/signupPin.dart';
 import 'package:smerp_go/model/request/signupToken.dart';
-import 'package:smerp_go/utils/UserUtils.dart';
+import 'package:smerp_go/core/session/credential_storage.dart';
 import 'package:smerp_go/utils/appUrl.dart';
 import 'package:smerp_go/utils/app_services/helperClass.dart';
 
@@ -89,8 +90,7 @@ class SignUpController extends GetxController{
               colorText: Colors.white,);
           }
         }catch(e, trace){
-          print(e);
-          print(trace);
+          AppLogger.error(e, trace, reason: 'signUpToken', tag: 'SignUp');
           isLoading.value = false;
         }
       }else{
@@ -150,9 +150,8 @@ class SignUpController extends GetxController{
               colorText: Colors.white,);
           }
         }catch(e, trace){
-          print(e);
-          print(trace);
-         isLoading.value = false;
+          AppLogger.error(e, trace, reason: 'createAccount', tag: 'SignUp');
+          isLoading.value = false;
         }
       }else{
         isLoading.value= false;
@@ -165,7 +164,6 @@ class SignUpController extends GetxController{
   }
 
   setPinStepOne(){
-    print("today");
     if(signUpPinSetUp.text.isEmpty){
       Get.snackbar("Invalid ",
         "No field should be empty",
@@ -177,15 +175,10 @@ class SignUpController extends GetxController{
         // curve: Curves.easeIn,
         transition: Transition
             .cupertino,);
-    }else{
-      print(signUpPinSetUp.text.length);
-      print(signUpPinSetUp.text);
     }
   }
 
   Future<void> setPinStepTwo()async{
-    print(signUpPinSetUp.text);
-    print(signUpConfirmPinSetUp.text);
     if(signUpConfirmPinSetUp.text.isEmpty){
       Get.snackbar("Invalid ",
         "No field should be empty",
@@ -202,7 +195,6 @@ class SignUpController extends GetxController{
         //var service = ApiService();
         var response = await ApiService.makeApiCall(signUpPin,
             AppUrls.signUpPin,requireAccess: false);
-        print(response);
 
       if(response is Success){
         try{
@@ -210,7 +202,7 @@ class SignUpController extends GetxController{
 
           if(data.isSuccess){
             isLoading.value=false;
-            SharedPref.save("userPin", signUpConfirmPinSetUp.text);
+            await CredentialStorage.savePin(signUpConfirmPinSetUp.text);
             FirebaseAnalytics.instance.logEvent(
               name: trackedPagesAndActions[1],
               parameters: <String, Object>{
@@ -230,8 +222,7 @@ class SignUpController extends GetxController{
               colorText: Colors.white,);
           }
         }catch(e, trace){
-          print(e);
-          print(trace);
+          AppLogger.error(e, trace, reason: 'setPinStepTwo', tag: 'SignUp');
           isLoading.value = false;
        }
       }else{
@@ -240,5 +231,14 @@ class SignUpController extends GetxController{
         repo.handleErrorResponse(response);
       }
     }
+  }
+
+  @override
+  void onClose() {
+    signUpPhoneNumber.dispose();
+    signUpEmailAddress.dispose();
+    signUpPinSetUp.dispose();
+    signUpConfirmPinSetUp.dispose();
+    super.onClose();
   }
 }

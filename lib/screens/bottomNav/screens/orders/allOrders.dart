@@ -6,6 +6,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
+import 'package:smerp_go/core/cache/app_list_cache.dart';
+import 'package:smerp_go/core/cache/app_list_cache_keys.dart';
 import 'package:smerp_go/controller/orderController.dart';
 import 'package:smerp_go/cubit/orderHistoryCubit/order_history_cubit.dart';
 import 'package:smerp_go/screens/bottomNav/screens/orders/updateOrderPaymentStatus.dart';
@@ -43,7 +46,7 @@ class _AllOrdersState extends State<AllOrders> {
   bool orderHistoryFetched = false;
 
   void getAllOrderCall() async {
-    if (isOrderListHasRun.value == false) {
+    if (!AppListCache.hasLoaded(AppListCacheKeys.orders)) {
       loading = true;
     }
 
@@ -59,7 +62,6 @@ class _AllOrdersState extends State<AllOrders> {
       });
 
       if (orderListWithoutRejected.isEmpty){
-        print("noseyest");
         setState(() {
         //  orderListWithoutRejectedIsEmpty.value = true;
         });
@@ -71,7 +73,7 @@ class _AllOrdersState extends State<AllOrders> {
         }
       });
     });
-    isOrderListHasRun.value = true;
+    AppListCache.setHasLoaded(AppListCacheKeys.orders, true);
   }
 
   @override
@@ -81,10 +83,8 @@ class _AllOrdersState extends State<AllOrders> {
     }else{
       orderListWithoutRejectedIsEmpty.value = false;
     }
-    if (!isOrderListHasRun.value) {
-      getAllOrderCall();
-    } else {
-      print("I  came herre");
+    if (AppListCache.shouldServeKey(AppListCacheKeys.orders)) {
+      AppLogger.debug('Orders loaded from cache count=${orderListTemp.length}', tag: 'Order');
       setState(() {
         orderList = orderListTemp;
         orderListWithoutRejected = orderList.where((element) =>
@@ -92,6 +92,8 @@ class _AllOrdersState extends State<AllOrders> {
       });
 
       //   orderList = orderListTemp;
+    } else {
+      getAllOrderCall();
     }
     super.initState();
   }
@@ -111,7 +113,7 @@ class _AllOrdersState extends State<AllOrders> {
                         showOrderHistory(message: state.errorResponse.message);
                       });
                     });
-                    print("Error");
+                    AppLogger.warning('Order history fetch failed', tag: 'Order');
                     cubit.resetState();
                   }
                  //print("response: ${orderHistoryList.length}");
@@ -427,5 +429,11 @@ class _AllOrdersState extends State<AllOrders> {
       orderListWithoutRejected = orderList.where((element) =>
       element.isAccepted != "Rejected").toList();
     });
+  }
+
+  @override
+  void dispose() {
+    refreshController2.dispose();
+    super.dispose();
   }
 }

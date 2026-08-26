@@ -11,6 +11,10 @@ import 'package:share_plus/share_plus.dart';
 import 'package:smerp_go/model/response/LoginResponse.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../core/cache/app_list_cache.dart';
+import '../core/cache/app_list_cache_keys.dart';
+import '../core/logging/app_logger.dart';
+import '../core/session/auth_session.dart';
 import '../model/response/defaultApiResponse.dart';
 
 final currencyFormatter =  NumberFormat("#,##0.00", "en_US");
@@ -72,9 +76,7 @@ class AppUtils{
   //  return returnValue;
   // }
   static void debug(String msg){
-    if (kDebugMode) {
-      print(msg);
-    }
+    AppLogger.debug(msg, tag: 'App');
   }
 
   static void showAlertDialog(BuildContext context, onTap, {String? msg}) {
@@ -125,21 +127,64 @@ bool validateMobile(String value) {
 
 var isLoading =Rx(false);
 var isSignUpViaPhone = Rx(true);
-String? userIdentityValue;
-int? identitySource;
-String otpCreateAccout= "";
-String? userName;
-String? userFirstName;
-var userBusinessName="".obs;
-String? userEmail;
-String? userMerchantCode;
-LoginData? loginData;
-RxString userFirstNameS="".obs;
+
+/// Compatible facades over [AuthSession] profile fields.
+String? get userIdentityValue => AuthSession.instance.userIdentityValue;
+set userIdentityValue(String? value) =>
+    AuthSession.instance.userIdentityValue = value;
+
+int? get identitySource => AuthSession.instance.identitySource;
+set identitySource(int? value) => AuthSession.instance.identitySource = value;
+
+String get otpCreateAccout => AuthSession.instance.otpCreateAccount;
+set otpCreateAccout(String value) =>
+    AuthSession.instance.otpCreateAccount = value;
+
+String? get userName => AuthSession.instance.userName;
+set userName(String? value) => AuthSession.instance.userName = value;
+
+String? get userFirstName => AuthSession.instance.userFirstName;
+set userFirstName(String? value) => AuthSession.instance.userFirstName = value;
+
+RxString get userBusinessName => AuthSession.instance.userBusinessName;
+
+String? get userEmail => AuthSession.instance.userEmail;
+set userEmail(String? value) => AuthSession.instance.userEmail = value;
+
+String? get userMerchantCode => AuthSession.instance.userMerchantCode;
+set userMerchantCode(String? value) =>
+    AuthSession.instance.userMerchantCode = value;
+
+LoginData? get loginData => AuthSession.instance.loginData;
+set loginData(LoginData? value) => AuthSession.instance.loginData = value;
+
+RxString get userFirstNameS => AuthSession.instance.userFirstNameS;
+
 var isProductCategoryHasRun = Rx(false);
 var isProductUnitCategoryHasRun = Rx(false);
-var isInventoryListHasRun =false;
-var isSalesListHasRun = Rx(false);
-var isOrderListHasRun = Rx(false);
+
+/// Inventory has-run is owned by [AppListCache]; this facade keeps call sites
+/// that still use the legacy global compiling without a second source of truth.
+bool get isInventoryListHasRun =>
+    AppListCache.hasLoaded(AppListCacheKeys.inventory);
+
+set isInventoryListHasRun(bool value) =>
+    AppListCache.setHasLoaded(AppListCacheKeys.inventory, value);
+
+/// Sales has-run is owned by [AppListCache].
+bool get isSalesListHasRun =>
+    AppListCache.hasLoaded(AppListCacheKeys.sales);
+
+set isSalesListHasRun(bool value) =>
+    AppListCache.setHasLoaded(AppListCacheKeys.sales, value);
+
+/// Orders has-run is owned by [AppListCache].
+bool get isOrderListHasRun =>
+    AppListCache.hasLoaded(AppListCacheKeys.orders);
+
+set isOrderListHasRun(bool value) =>
+    AppListCache.setHasLoaded(AppListCacheKeys.orders, value);
+
 var isCatalogListHasRun = Rx(false);
 var saleIsEmpty= RxBool(false);
 var productIsEmpty= RxBool(false);

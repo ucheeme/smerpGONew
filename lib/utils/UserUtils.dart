@@ -2,25 +2,37 @@ import 'dart:convert';
 
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smerp_go/core/images/app_network_image.dart';
+import 'package:smerp_go/core/session/auth_session.dart';
 import 'package:smerp_go/utils/AppUtils.dart';
 import 'package:http/http.dart' as http;
 
 
 String truncateText(String value,int start){
-  if(value.length>start){
-    return value.replaceRange(start, value.length, "...");
-  }else{
-    return value;
-  }
+    if(value.length>start){
+      return value.replaceRange(start, value.length, "...");
+    }else{
+      return value;
+    }
 }
 
-String userAccessToken = "";
-String clientAccessToken = "";
-String actionBy = "";
-String inventoryId="";
-RxString userImage ="".obs;
-RxString storeNPhone ="".obs;
-RxString storeNEmail ="".obs;
+/// Compatible facades over [AuthSession] so existing call sites keep working.
+String get userAccessToken => AuthSession.instance.accessToken;
+set userAccessToken(String value) => AuthSession.instance.accessToken = value;
+
+String get clientAccessToken => AuthSession.instance.clientAccessToken;
+set clientAccessToken(String value) =>
+    AuthSession.instance.clientAccessToken = value;
+
+String get actionBy => AuthSession.instance.actionBy;
+set actionBy(String value) => AuthSession.instance.actionBy = value;
+
+String get inventoryId => AuthSession.instance.inventoryId;
+set inventoryId(String value) => AuthSession.instance.inventoryId = value;
+
+RxString get userImage => AuthSession.instance.userImage;
+RxString get storeNPhone => AuthSession.instance.storeNPhone;
+RxString get storeNEmail => AuthSession.instance.storeNEmail;
 
 class SharedPref {
   static read(String key) async {
@@ -62,10 +74,14 @@ bool checkIfProfileDataIsCompleted(){
 }
 
 Future<String> fetchImageToBase64(String url) async {
-  final response = await http.get(Uri.parse(url));
-  if (response.statusCode == 200) {
-   return base64Encode(response.bodyBytes);
-  } else {
+  try {
+    final bytes = await AppNetworkImage.loadBytes(url);
+    return base64Encode(bytes);
+  } catch (_) {
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      return base64Encode(response.bodyBytes);
+    }
     throw Exception('Failed to load image');
   }
 }

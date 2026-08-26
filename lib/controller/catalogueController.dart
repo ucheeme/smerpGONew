@@ -1,9 +1,13 @@
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
+import 'package:smerp_go/core/cache/app_list_cache.dart';
+import 'package:smerp_go/core/cache/app_list_cache_keys.dart';
 import 'package:smerp_go/model/response/defaultApiResponse.dart';
 import 'package:smerp_go/utils/mockdata/tempData.dart';
 
 import '../Reposistory/apiRepo.dart';
+import '../Reposistory/catalogMutationRepo.dart';
 import '../apiServiceLayer/apiService.dart';
 import '../apiServiceLayer/api_status.dart';
 import '../model/response/catalogListResponse.dart';
@@ -75,7 +79,7 @@ class CatalogueController extends GetxController{
     List<CatalogFull> result =[];
 
     if(enterValue.isEmpty){
-      print("I am all catalog");
+      AppLogger.debug('Showing all catalog items', tag: 'Catalogue');
      catalogsF.value =catalogsFTemp;
      checkIfAllProductInCategoryIsVisible(catalogsF.value,enterValue);
      return catalogsF.value;
@@ -205,7 +209,7 @@ class CatalogueController extends GetxController{
   }
 //cdfrdp
   bool getActiveChioce(String value){
-    print(value);
+    AppLogger.debug('Catalog filter choice: $value', tag: 'Catalogue');
     switch(value){
       case "":{
         catalogChoiceId.value=0;
@@ -290,11 +294,12 @@ class CatalogueController extends GetxController{
         if(data.isSuccess && data.data != null){
 
           catalogListTemp= data.data!;
+          AppListCache.markFresh(AppListCacheKeys.catalog);
           isUpdated.value = true;
           if(data.data.isEmpty){
             noProductVisible.value= true;
             allCatalogListdisplayed(catalogListTemp);
-            print(catalogsF.length);
+            AppLogger.debug('Empty catalog API response', tag: 'Catalogue');
           }else{
             allCatalogListdisplayed(catalogListTemp);
            noProductVisible.value=false;
@@ -341,8 +346,8 @@ class CatalogueController extends GetxController{
         if(data.isSuccess){
 
           isLoading.value = false;
-         // (isRefresh)?refreshController?.refreshCompleted():null;
-          allCatalogListAsShownToUsers();
+          await CatalogRepo().refreshCatalogListAsShownToUsers();
+          catalogsF.value = List<CatalogFull>.from(catalogsFTemp);
           return true;
         }else{
           isLoading.value = false;
@@ -350,16 +355,12 @@ class CatalogueController extends GetxController{
         }
       }catch(e,trace){
         isLoading.value = false;
-      // allCatalogListdisplayed(catalogListTemp);
         AppUtils.debug(e.toString());
         AppUtils.debug(trace.toString());
         return false;
-       // (isRefresh)?refreshController?.refreshFailed():null;
       }
     }else{
-     // (isRefresh)?refreshController?.refreshFailed():null;
       var repo = ApiRepository();
-     // catalogsF= allCatalogListdisplayed(catalogListTemp);
       repo.handleErrorResponse(response);
       return false;
     }
@@ -368,106 +369,41 @@ class CatalogueController extends GetxController{
   Future<bool> updateCatalogAllProduct(bool isVisible)
   async{
     isLoading.value= true;
-    var response = await ApiService.makeApiCall(null,
-        AppUrls().updateAllProductCatalogView( isVisible),
-        method: HTTP_METHODS.put );
-    if(response is Success){
-      try{
-        var data = defaultApiResponseFromJson(await response.response as String);
-        if(data.isSuccess){
-
-          isLoading.value = false;
-          // (isRefresh)?refreshController?.refreshCompleted():null;
-          await allCatalogListAsShownToUsers();
-          return true;
-        }else{
-          isLoading.value = false;
-          return false;
-        }
-      }catch(e,trace){
-        isLoading.value = false;
-        // allCatalogListdisplayed(catalogListTemp);
-        AppUtils.debug(e.toString());
-        AppUtils.debug(trace.toString());
-        return false;
-        // (isRefresh)?refreshController?.refreshFailed():null;
-      }
-    }else{
-      // (isRefresh)?refreshController?.refreshFailed():null;
-      var repo = ApiRepository();
-      // catalogsF= allCatalogListdisplayed(catalogListTemp);
-      repo.handleErrorResponse(response);
-      return false;
+    final ok = await CatalogRepo().updateCatalogAllProduct(isVisible);
+    isLoading.value = false;
+    if (ok) {
+      catalogsF.value = List<CatalogFull>.from(catalogsFTemp);
     }
+    return ok;
   }
 
 
   Future<bool> updateCatalogAllProductCata(bool isVisible,int category)
   async{
     isLoading.value= true;
-    var response = await ApiService.makeApiCall(null,
-        AppUrls().updateCatalogProductAtCategoryRecord( category,isVisible),
-        method: HTTP_METHODS.put );
-    if(response is Success){
-      try{
-        var data = defaultApiResponseFromJson(await response.response as String);
-        if(data.isSuccess){
-
-          isLoading.value = false;
-          // (isRefresh)?refreshController?.refreshCompleted():null;
-         await allCatalogListAsShownToUsers();
-          return true;
-        }else{
-          isLoading.value = false;
-          return false;
-        }
-      }catch(e,trace){
-        isLoading.value = false;
-        // allCatalogListdisplayed(catalogListTemp);
-        AppUtils.debug(e.toString());
-        AppUtils.debug(trace.toString());
-        return false;
-        // (isRefresh)?refreshController?.refreshFailed():null;
-      }
-    }else{
-      // (isRefresh)?refreshController?.refreshFailed():null;
-      var repo = ApiRepository();
-      // catalogsF= allCatalogListdisplayed(catalogListTemp);
-      repo.handleErrorResponse(response);
-      return false;
+    final ok = await CatalogRepo().updateCatalogAllProductCata(
+      isVisible,
+      category,
+    );
+    isLoading.value = false;
+    if (ok) {
+      catalogsF.value = List<CatalogFull>.from(catalogsFTemp);
     }
+    return ok;
   }
 
 
   List<CatalogFull> allCatalogListdisplayed(List<CatalogData> data){
-    print("the length of data ${data.length}");
     result.clear();
-    catalogsFTemp.clear();
-    if(data.isEmpty){
-      for(var element in inventoryListTemp){
-        catalogsFTemp.add(CatalogFull(element, false));
-        result.add(CatalogFull(element, false));
-      }
-      print(result.length);
-      return result;
-    }else{
-      print("the length of data not empty ${data.length}");
-      for (var element in inventoryListTemp) {
-        bool found = false;
-        for (var p = 0; p < data.length; p++) {
-          if (data[p].id == element.id) {
-            found = true;
-            break;
-          }
-        }
-
-        print(found ? "added" : "not added");
-        catalogsFTemp.add(CatalogFull(element, found));
-        result.add(CatalogFull(element, found));
-      }
-      print(catalogsFTemp.length);
-      return catalogsFTemp;
-    }
+    final rebuilt = CatalogRepo.rebuildCatalogsFTemp(data);
+    result.addAll(rebuilt);
+    AppListCache.markFresh(AppListCacheKeys.catalog);
+    AppLogger.debug(
+      data.isEmpty
+          ? 'Catalog display built from inventory count=${result.length}'
+          : 'Catalog display merged count=${catalogsFTemp.length}',
+      tag: 'Catalogue',
+    );
     return result;
   }
 
@@ -477,7 +413,6 @@ class CatalogueController extends GetxController{
      case "":{
        List<CatalogFull> res= data.where((element) => element.isVisible==false).toList();
        if(res.isEmpty){
-         print("fghj");
          allProductVisible.value = true;
          return true;
        }else{
@@ -512,11 +447,9 @@ class CatalogueController extends GetxController{
         List<CatalogFull> res= data.where((element) =>
         (element.isVisible==false)).toList();
         if(res.isEmpty){
-          print("feell");
           allElectronicsVisible.value = true;
           return true;
         }else{
-          print("no value");
           allElectronicsVisible.value = false;
           return false;
         }

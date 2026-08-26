@@ -87,8 +87,6 @@ class _ProductCategoryState extends State<ProductCategory> {
                             CreateCustomProductCategory());
                         if(response){
                           getProduCateCall();
-                        }else{
-                          print("failed");
                         }
                       },
                       child: Icon(Icons.add_circle))
@@ -158,10 +156,16 @@ class _ProductCategoryState extends State<ProductCategory> {
 
 
     prodCategory = await _controller.allProductCategoryList(isRefresh: true,
-    refreshController: refreshController);
+    refreshController: refreshController2);
     setState(() {
       prodCategory = prodCategory;
     });
+  }
+
+  @override
+  void dispose() {
+    refreshController2.dispose();
+    super.dispose();
   }
   
 }

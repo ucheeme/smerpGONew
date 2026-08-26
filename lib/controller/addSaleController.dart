@@ -2,6 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
+import 'package:smerp_go/core/cache/app_list_cache.dart';
+import 'package:smerp_go/core/cache/app_list_cache_keys.dart';
 import 'package:smerp_go/model/request/salesPaid.dart';
 
 import '../Reposistory/apiRepo.dart';
@@ -57,7 +60,7 @@ class AddNewSaleController extends GetxController{
 
 
   int paymentStatusid(String status){
-    print(status);
+    AppLogger.debug('paymentStatusid: $status', tag: 'Sale');
     switch (status){
       case 'Paid':
         return 1;
@@ -205,6 +208,7 @@ class AddNewSaleController extends GetxController{
         if(data.isSuccess && data.data != null){
           isLoading.value = false;
          saleListTemp= data.data!;
+          AppListCache.markFresh(AppListCacheKeys.sales);
           if(data.data!.isEmpty){
             saleIsEmpty.value= true;
           }else{
@@ -489,6 +493,17 @@ class AddNewSaleController extends GetxController{
   var unit =RxString("");
   List<String> units = ["Box","Pack", "Pair","Bag","Pieces","CM(Centimeter",
   "Dz(Doppelzentner","ft","Gram","Kg","Yard"];
+
+  @override
+  void onClose() {
+    productName.dispose();
+    productCostPrice.dispose();
+    customerName.dispose();
+    productSellingPrice.dispose();
+    productQuantity.dispose();
+    quantityController.dispose();
+    super.onClose();
+  }
 }
 
 class SaleCreateItem {

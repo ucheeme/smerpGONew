@@ -10,11 +10,11 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import '../../../../controller/dashboardController.dart';
 import '../../../../controller/inventoryController.dart';
 import '../../../../model/response/inventoryList.dart';
-import '../../../../utils/AppUtils.dart';
-import '../../../../utils/UserUtils.dart';
 import '../../../../utils/appColors.dart';
 import '../../../../utils/appDesignUtil.dart';
 import '../../../../utils/mockdata/tempData.dart';
+import 'package:smerp_go/core/cache/app_list_cache.dart';
+import 'package:smerp_go/core/cache/app_list_cache_keys.dart';
 import '../../../../utils/newReceipt.dart';
 import '../profile/profileList.dart';
 import 'addNewProduct.dart';
@@ -41,7 +41,7 @@ class _InventoryMainState extends State<InventoryMain> {
       initialRefresh: false);
   bool obscurePassword = true;
   void getInventoryCall() async {
-    if (isInventoryListHasRun == false) {
+    if (!AppListCache.hasLoaded(AppListCacheKeys.inventory)) {
       loading = true;
     }
     _controllerInventory.inventoryList = await _controllerInventory.allInventorylist();
@@ -57,18 +57,8 @@ class _InventoryMainState extends State<InventoryMain> {
         }
       });
     });
-    isInventoryListHasRun = true;
-    double temp = 0;
-    int tempQuantity = 0;
-    // for(var element in  _controllerInventory.inventoryList){
-    //   temp =temp+( element.quantity *element.sellingPrice);
-    //   tempQuantity = tempQuantity+element.quantity;
-    // }
-    // setState(() {
-    //   _controllerInventory.inventoryAmount.value=temp.toString();
-    //   _controllerInventory.inventoryCount.value=tempQuantity.toString();
-    // });
-
+    // Preserve legacy behavior: exit loading path even if fetch did not markFresh.
+    AppListCache.setHasLoaded(AppListCacheKeys.inventory, true);
   }
   void inventoryReCall() async{
     _controllerInventory.inventoryList = await _controllerInventory.allInventorylist(
@@ -95,12 +85,11 @@ class _InventoryMainState extends State<InventoryMain> {
     dashboardApi();
     // (isInventoryListHasRun)? inventoryReCall():null;
     super.initState();
-    if (!isInventoryListHasRun) {
+    if (AppListCache.shouldServeKey(AppListCacheKeys.inventory)) {
+      _controllerInventory.inventoryList = inventoryListTemp;
+    } else {
       getInventoryCall();
       //inventoryApi();
-    } else {
-      inventoryReCall();
-      _controllerInventory.inventoryList = inventoryListTemp;
     }
   }
 
@@ -375,6 +364,12 @@ class _InventoryMainState extends State<InventoryMain> {
           isLoading: _controllerInventory.isLoading.value
       );
     });
+  }
+
+  @override
+  void dispose() {
+    refreshController.dispose();
+    super.dispose();
   }
 
   Future<void> onRefresh() async {

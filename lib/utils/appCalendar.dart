@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
 import 'package:smerp_go/utils/app_services/helperClass.dart';
 
 import 'appColors.dart';
@@ -163,7 +164,7 @@ class _AppCalendarState extends State<AppCalendar> {
                                       }
                                     }
                                     if(((index+1) <=7) && (p>1)){
-                                     print("the previous month is ${index + 1} $p");
+                                     AppLogger.debug('Calendar previous month selected index=${index + 1}', tag: 'Calendar');
                                      showMonthDate([(_selectedDate.month-1),
                                         _selectedDate.year.toString()]);
 
@@ -289,7 +290,6 @@ class _AppCalendarState extends State<AppCalendar> {
        _selectedDate= DateTime.now();
         var y= response[1];
         var day = daysInMonth(response[0],int.parse(y));
-        print(day);
       var monthDif = DateTime.parse(
          "${response[1]}-$months-$day")
           .difference(_selectedDate).inDays;
@@ -297,8 +297,6 @@ class _AppCalendarState extends State<AppCalendar> {
           _selectedDate =
               _selectedDate.add(Duration(days: monthDif));
           month.value = getMonth(response[0]);
-          print(_selectedDate);
-          print(month.value);
         });
      } else {
         var months="00";
@@ -306,7 +304,6 @@ class _AppCalendarState extends State<AppCalendar> {
           months = response.toString();
         }else{
           months= response[0].toString().padLeft(2, '0');
-          print(months);
         }
         _selectedDate= DateTime.now();
 
@@ -318,8 +315,6 @@ class _AppCalendarState extends State<AppCalendar> {
           _selectedDate = _selectedDate.subtract(
               Duration(days: monthDifff.inDays));
           month.value = getMonth(response[0]);
-          print(_selectedDate);
-          print(month.value);
         });
 
       }
@@ -528,7 +523,7 @@ class _AppCalendarState extends State<AppCalendar> {
           _selectedRange[newestSelectedIndex] = false;
            dateRange[1]="${date} - $month- $year";
           endDate.text = "${date}-$month-$year";
-          print(endDate.text);
+          AppLogger.debug('Calendar end date selected', tag: 'Calendar');
         }
       }
       _selectedRange[index] = true;
@@ -698,7 +693,7 @@ class _SelectMonthYearState extends State<SelectMonthYear> {
                           setDateController, hintText: "Select Date")),
                   GestureDetector(
                     onTap: () {
-                      print((_selectedIndex + 1));
+                      AppLogger.debug('Calendar month index=${_selectedIndex + 1}', tag: 'Calendar');
                       Get.back(result: [(_selectedIndex + 1),year]);
                     //  _selectedIndex= -1;
                     },

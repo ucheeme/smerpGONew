@@ -1,3 +1,8 @@
+/// Temporary in-memory list caches used across screens.
+///
+/// Freshness/TTL is owned by [AppListCache] (`lib/core/cache/`).
+/// Prefer marking cache keys fresh when these lists are rewritten, and
+/// checking [AppListCache.shouldServe] / [AppListCache.isFresh] before reuse.
 import 'package:get/get.dart';
 import 'package:smerp_go/model/response/inventoryList.dart';
 import 'package:smerp_go/model/response/report/performingAnalysis.dart';

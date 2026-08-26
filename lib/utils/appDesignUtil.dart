@@ -20,6 +20,7 @@ import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:overlay_loader_with_app_icon/overlay_loader_with_app_icon.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
 import 'package:smerp_go/model/response/inventoryList.dart';
 import 'package:smerp_go/model/response/order/orderDetails.dart';
 import 'package:smerp_go/model/response/sales/saleList.dart';
@@ -31,6 +32,7 @@ import 'package:smerp_go/screens/bottomNav/screens/sales/editSale.dart';
 import 'package:smerp_go/screens/bottomsheets/customerReceipt.dart';
 import 'package:smerp_go/screens/bottomsheets/deleteOption.dart';
 import 'package:smerp_go/screens/bottomsheets/updateQuantityStock.dart';
+import 'package:smerp_go/core/images/app_network_image.dart';
 import 'package:smerp_go/utils/appColors.dart';
 import 'package:smerp_go/utils/app_services/helperClass.dart';
 import 'package:smerp_go/utils/customPin.dart';
@@ -485,9 +487,8 @@ bool isBase64(String value) {
   try {
     base64.decode(value);
     return true;
-  } catch (e, trace) {
-    print(e);
-    print(trace);
+  } catch (_) {
+    AppLogger.debug('isBase64 decode failed', tag: 'Util');
     return false;
   }
 }
@@ -942,7 +943,6 @@ Widget salesMockData(SalesDatum? mockData, BuildContext context,
 
 Widget ordersMockData(Orders? mockData, BuildContext context,
     {dynamic receipt, dynamic editSale}) {
-  print("This is the value: ${mockData!.custormerName} and ${mockData!.totalAmount}");
   var date = formatDate(
     (mockData!.orderDate).toLocal(),
     [
@@ -1250,22 +1250,21 @@ Widget inventoryMockDataDesign(InventoryInfo? mockData,
 }
 
 Image getImageNetwork(String image,) {
-  print(image.isEmpty);
-  if (image.isNotEmpty) {
-    return Image.network(image,
+  if (AppNetworkImage.isRemoteUrl(image)) {
+    return AppNetworkImage.image(
+      image,
+      fit: BoxFit.fill,
       errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-      print("testing");
-      Fluttertoast.showToast(msg: "Profile image failed to load");
-        return Image.asset(
-          'assets/pCircle.png',
-        fit: BoxFit.fill,
+        Fluttertoast.showToast(msg: "Profile image failed to load");
+        return const Image(
+          image: AssetImage(AppNetworkImage.placeholderAsset),
+          fit: BoxFit.fill,
         );
       },
-      fit: BoxFit.fill,
     );
   } else {
     return const Image(
-      image: AssetImage('assets/pCircle.png'),
+      image: AssetImage(AppNetworkImage.placeholderAsset),
       fit: BoxFit.fill,
     );
   }
@@ -1659,7 +1658,6 @@ int paymentStatusStringToInt(String value) {
 Widget editSaleSelectedDesign(SalesItemInfo mockData, InventoryInfo? info,
     {int quantity = 0, int qtyList = 0, String category = "Box",
       int paymentStatus = 0}) {
-  print(info?.productImage);
   var date = formatDate(
     (DateTime.now()).toLocal(),
     [dd, '/', mm, '/', yy, ' ', h, ':', nn, '', am],
@@ -1945,9 +1943,7 @@ Future<int> productCategoryId(String name) async {
     await _controllerProduct.allProductCategoryList();
   }
   for (var element in productCategoryList) {
-    print(element.name);
     if (element.name.toLowerCase() == name.toLowerCase()) {
-      // print("hshhs");
       id = element.id;
       break;
     }
@@ -1958,15 +1954,12 @@ Future<int> productCategoryId(String name) async {
 
 Future<int> productUnitCategoryId(String name) async {
   int id = 0;
-  print(name);
   //
   if (productUnitCategoryList.isEmpty) {
     await _controllerProduct.allProductUnitCategoryList();
   }
   for (var element in productUnitCategoryList) {
-    print(element.name);
     if (element.name.toLowerCase() == name.toLowerCase()) {
-      print("hshhs");
       id = element.id;
       break;
     }
@@ -1976,7 +1969,6 @@ Future<int> productUnitCategoryId(String name) async {
 }
 
 Widget paymentStatusDesignId(int status) {
-  print(status);
   switch (status) {
     case 1:
       return paymentStatuDesignColor("Paid", kPaidColor, 'assets/paid.png');
@@ -1993,7 +1985,6 @@ Widget paymentStatusDesignId(int status) {
 }
 
 Widget orderPaymentStatusDesignId(int status) {
-  print(status);
   switch (status) {
     case 1:
       return paymentStatuDesignColor("Paid", kPaidColor, 'assets/paid.png');

@@ -133,11 +133,6 @@ enum SearchReports{
   lastweek,lastmonth,thisweek,thismonth
 }
 
-
-enum SearchFaqs{
-  all,account,lostPassword,sales
-}
-
 var identitySourceByPhone = 1;
 var identitySourceByMail = 2;
 
@@ -148,3 +143,6 @@ class CatalogFull{
 }
 
 RefreshController refreshController = RefreshController(initialRefresh: false);
+
+/// Prefer a local [RefreshController] per screen; dispose it in [State.dispose].
+/// This instance remains for legacy controller callbacks that omit an explicit controller.

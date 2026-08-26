@@ -9,8 +9,9 @@ import '../model/response/report/customRangeSales.dart';
 import '../model/response/report/performingAnalysis.dart';
 import '../model/response/report/productAnalysis.dart';
 import '../utils/appUrl.dart';
+import 'package:smerp_go/core/repositories/i_report_analysis_repository.dart';
 
-class ReportAnalysisRepo extends ApiRepository{
+class ReportAnalysisRepo extends ApiRepository implements IReportAnalysisRepository{
   Future<Object> getSalesReport(int period,{String fromDate="",String toDate=""}) async {
     var response = await ApiService.makeApiCall(
         null, (period==4)?
@@ -37,12 +38,12 @@ class ReportAnalysisRepo extends ApiRepository{
         }
 
       } else {
-        print("failed response here:${r}");
+        logRepoFailure('getSalesReport', r);
         return r;
       }
     }
     else {
-      print("failed2 response here:${r}");
+      logRepoFailure('getSalesReport', r);
       handleErrorResponse(response);
       return errorResponse!;
     }
@@ -62,12 +63,12 @@ class ReportAnalysisRepo extends ApiRepository{
         ProductAnalysis res = productAnalysisFromJson(json.encode(r.data));
         return res;
       } else {
-        print("failed response here:${r}");
+        logRepoFailure('getSalesReport', r);
         return r;
       }
     }
     else {
-      print("failed2 response here:${r}");
+      logRepoFailure('getSalesReport', r);
       handleErrorResponse(response);
       return errorResponse!;
     }
@@ -83,12 +84,12 @@ class ReportAnalysisRepo extends ApiRepository{
         PerformingAnalysis res = performingAnalysisFromJson(json.encode(r.data));
         return res;
       } else {
-        print("failed response here:${r}");
+        logRepoFailure('getSalesReport', r);
         return r;
       }
     }
     else {
-      print("failed2 response here:${r}");
+      logRepoFailure('getSalesReport', r);
       handleErrorResponse(response);
       return errorResponse!;
     }

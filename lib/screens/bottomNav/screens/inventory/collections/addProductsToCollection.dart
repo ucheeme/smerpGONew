@@ -50,6 +50,12 @@ class _AddProductToCollectionState extends State<AddProductToCollection> {
   }
 
   @override
+  void dispose() {
+    refreshController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     _controller.getCollectionInventory(
         context, widget.isUpdateProductCollection,

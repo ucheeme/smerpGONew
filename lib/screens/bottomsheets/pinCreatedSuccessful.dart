@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:smerp_go/core/session/credential_storage.dart';
 import 'package:smerp_go/utils/appColors.dart';
 import 'package:smerp_go/utils/appDesignUtil.dart';
 
@@ -46,9 +47,11 @@ class _PinCreationCreationSuccessfulState extends State<PinCreationCreationSucce
           gapHeight(50.h),
          GestureDetector(
            onTap: ()async{
-             String e = await SharedPref.read("userPin");
-             String pin = e.substring(1, e.length - 1);
-             SharedPref.save("userId", userIdentityValue!);
+             final pin = await CredentialStorage.readPin();
+             if (pin == null || userIdentityValue == null) {
+               return;
+             }
+             await SharedPref.save("userId", userIdentityValue!);
              _controller.loginUser(userIdentityValue!, pin,context: context);
            },
            child: dynamicContainer(Center(

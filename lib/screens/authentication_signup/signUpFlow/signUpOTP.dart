@@ -75,7 +75,6 @@ class _SignUpOTPState extends State<SignUpOTP> {
                             onTap: (String value) {
                               setState(
                                     () {
-                                  print("a test");
                                   accountVerificationController.otpValue.value =
                                       value;
                                   accountVerificationController.otplength

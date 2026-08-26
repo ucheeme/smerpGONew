@@ -348,4 +348,18 @@ RxBool  isLoading = false.obs;
   var unit =RxString("");
   List<String> units = ["Box","Pack", "Pair","Bag","Pieces","CM(Centimeter",
     "Dz(Doppelzentner","ft","Gram","Kg","Yard"];
+
+  @override
+  void onClose() {
+    productName.dispose();
+    categoryName.dispose();
+    unitName.dispose();
+    categoryDescription.dispose();
+    unitDescription.dispose();
+    productCostPrice.dispose();
+    productSellingPrice.dispose();
+    productQuantity.dispose();
+    quantityController.dispose();
+    super.onClose();
+  }
 }

@@ -1,9 +1,12 @@
+import 'dart:async';
 import 'dart:io';
-
 
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'dart:convert';
+import 'package:smerp_go/core/logging/app_logger.dart';
+import 'package:smerp_go/core/logging/sensitive_log_sanitizer.dart';
+import '../core/network/api_constants.dart';
 import '../main.dart';
 import '../model/response/defaultApiResponse.dart';
 import '../utils/AppUtils.dart';
@@ -31,51 +34,43 @@ class ApiService{
         'Content-Type': 'application/json',
         'accept': '*/*',
       };
-      AppUtils.debug("/****rest call request starts****/");
-      AppUtils.debug("url: $url");
-      AppUtils.debug("headers: $headers");
-      AppUtils.debug("body: $body");
-      AppUtils.debug("method: $method");
+      _logRequest(url: url, headers: headers, body: body, method: method);
       Response? response;
       switch (method) {
         case HTTP_METHODS.post:
-          response = await http.post(url,
+          response = await _withTimeout(http.post(url,
              headers: headers,
               body: body
-          );
+          ));
           break;
         case HTTP_METHODS.put:
-          response = await http.put(url,
+          response = await _withTimeout(http.put(url,
               headers: headers,
               body: body,
 
-          );
+          ));
           break;
         case HTTP_METHODS.patch:
-          response = await http.patch(url,
+          response = await _withTimeout(http.patch(url,
               headers: headers,
               body: body
-          );
+          ));
           break;
         case HTTP_METHODS.get:
           AppUtils.debug("trying a get request");
-          response = await http.get(url,
-             // timeout:Duration(seconds: 10),
+          response = await _withTimeout(http.get(url,
               headers: headers,
-          );
+          ));
           break;
         case HTTP_METHODS.delete:
-          response = await http.delete(url,
+          response = await _withTimeout(http.delete(url,
               headers: headers,
               body: body
-          );
+          ));
           break;
       }
 
-      AppUtils.debug("/****rest call response starts****/");
-      AppUtils.debug("url: $url");
-      AppUtils.debug("status code: ${response.statusCode}");
-      AppUtils.debug("rest response: "+response.body);
+      _logResponse(url: url, response: response);
       if (ApiResponseCodes.success == response.statusCode){
         return  Success(response.statusCode,response.body);
       }else if(response.headers['www-authenticate']!=null){
@@ -93,15 +88,13 @@ class ApiService{
         return  Failure(response.statusCode,
            response.body);
       }
-      // if (ApiResponseCodes.authorizationError == response.statusCode){
-      //   print("this mee");
-      //   return ForbiddenAccess();
-      // }
       else{
         return  Failure(response.statusCode,response.body);
       }
 
 
+    }on TimeoutException {
+      return NetWorkFailure();
     }on HttpException{
       return  NetWorkFailure();
 
@@ -109,8 +102,7 @@ class ApiService{
       return  UnExpectedError();
 
     } catch (e, trace) {
-      print(e);
-      print(trace);
+      AppLogger.error(e, trace, reason: 'makeApiCall', tag: 'API');
       return  UnExpectedError();
     }
   }
@@ -130,48 +122,42 @@ class ApiService{
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       };
-      AppUtils.debug("/****rest call request starts****/");
-      AppUtils.debug("url: $url");
-      AppUtils.debug("headers: $headers");
-      AppUtils.debug("body: $body");
+      _logRequest(url: url, headers: headers, body: body, method: method);
       Response? response;
       switch (method) {
         case HTTP_METHODS.post:
-          response = await http.post(url,
+          response = await _withTimeout(http.post(url,
               headers: headers,
               body: body
-          );
+          ));
           break;
         case HTTP_METHODS.put:
-          response = await http.put(url,
+          response = await _withTimeout(http.put(url,
               headers: headers,
               body: body
-          );
+          ));
           break;
         case HTTP_METHODS.patch:
-          response = await http.patch(url,
+          response = await _withTimeout(http.patch(url,
               headers: headers,
               body: body
-          );
+          ));
           break;
         case HTTP_METHODS.get:
           AppUtils.debug("trying a get request");
-          response = await http.get(url,
+          response = await _withTimeout(http.get(url,
               headers: headers
-          );
+          ));
           break;
         case HTTP_METHODS.delete:
-          response = await http.delete(url,
+          response = await _withTimeout(http.delete(url,
               headers: headers,
               body: body
-          );
+          ));
           break;
       }
 
-      AppUtils.debug("/****rest call response starts****/");
-      AppUtils.debug("url: $url");
-      AppUtils.debug("status code: ${response.statusCode}");
-      AppUtils.debug("rest response: "+response.body);
+      _logResponse(url: url, response: response);
       if (ApiResponseCodes.success == response.statusCode){
         return  Success(response.statusCode,response.body);
       }
@@ -191,6 +177,8 @@ class ApiService{
         return  Failure(response.statusCode,"Error Occurred");
       }
 
+    }on TimeoutException {
+      return NetWorkFailure();
     }on HttpException{
       return  NetWorkFailure();
 
@@ -217,13 +205,12 @@ class ApiService{
       };
       Uri url ;
       url = isProduction ?  Uri.https(AppUrls.rawBaseUrl, endpoint, query): Uri.http(AppUrls.rawBaseUrl, endpoint, query);
-      //  var url = Uri.http(AppUrls.rawBaseUrl, endpoint, query);
       AppUtils.debug("/****rest call request starts****/");
       AppUtils.debug("url: $url");
-      AppUtils.debug("headers: $headers");
-      var response  = await http.get(url,
+      AppUtils.debug("headers: ${SensitiveLogSanitizer.redactHeaders(headers)}");
+      var response  = await _withTimeout(http.get(url,
         headers: headers,
-      );
+      ));
       AppUtils.debug("/****rest call response starts****/");
       AppUtils.debug("status code: ${response.statusCode}");
       AppUtils.debug("rest response: "+response.body);
@@ -233,12 +220,11 @@ class ApiService{
       if (ApiResponseCodes.resourcenotfound == response.statusCode || ApiResponseCodes.internalServerError == response.statusCode){
         return  Failure(response.statusCode,(defaultApiResponseFromJson(response.body)));
       }
-      // if (ApiResponseCodes.authorizationError == response.statusCode){
-      //   return ForbiddenAccess();
-      // }
       else{
         return  Failure(response.statusCode,"Error Occurred");
       }
+    }on TimeoutException {
+      return NetWorkFailure();
     }on HttpException{
       return  NetWorkFailure();
     }on FormatException{
@@ -249,12 +235,16 @@ class ApiService{
   }
   static Future<File> downloadFile(String url, String filename) async {
     http.Client client =  http.Client();
-    var req = await client.get(Uri.parse(url));
-    var bytes = req.bodyBytes;
-    String dir = (await getApplicationDocumentsDirectory()).path;
-    File file =  File('$dir/$filename');
-    await file.writeAsBytes(bytes);
-    return file;
+    try {
+      var req = await _withTimeout(client.get(Uri.parse(url)));
+      var bytes = req.bodyBytes;
+      String dir = (await getApplicationDocumentsDirectory()).path;
+      File file =  File('$dir/$filename');
+      await file.writeAsBytes(bytes);
+      return file;
+    } finally {
+      client.close();
+    }
   }
   static Future<Object> uploadDoc(File file, String url, String docType) async {
     try {
@@ -275,8 +265,8 @@ class ApiService{
     );
       AppUtils.debug("/****rest call request starts****/");
       AppUtils.debug("url: $url");
-      AppUtils.debug("headers: $headers");
-    var res = await request.send();
+      AppUtils.debug("headers: ${SensitiveLogSanitizer.redactHeaders(headers)}");
+    var res = await request.send().timeout(ApiConstants.requestTimeout);
     final response = await res.stream.bytesToString();
     AppUtils.debug("/****rest call response starts****/");
     AppUtils.debug("status code: ${res.statusCode}");
@@ -287,12 +277,11 @@ class ApiService{
     if (ApiResponseCodes.resourcenotfound == res.statusCode || ApiResponseCodes.internalServerError == res.statusCode){
       return  Failure(res.statusCode,(defaultApiResponseFromJson(response)));
     }
-    // if (ApiResponseCodes.authorizationError == res.statusCode){
-    //   return ForbiddenAccess(response, response.body);
-    // }
     else{
       return  Failure(res.statusCode,"Error Occurred");
     }
+    }on TimeoutException {
+      return NetWorkFailure();
     }on HttpException{
       return  NetWorkFailure();
 
@@ -302,5 +291,36 @@ class ApiService{
     }catch (e){
       return UnExpectedError();
     }
+  }
+
+  static Future<Response> _withTimeout(Future<Response> request) {
+    return request.timeout(ApiConstants.requestTimeout);
+  }
+
+  static void _logRequest({
+    required Uri url,
+    required Map<String, String> headers,
+    required String? body,
+    HTTP_METHODS? method,
+  }) {
+    AppUtils.debug("/****rest call request starts****/");
+    AppUtils.debug("url: $url");
+    AppUtils.debug(
+      "headers: ${SensitiveLogSanitizer.redactHeaders(headers)}",
+    );
+    AppUtils.debug("body: ${SensitiveLogSanitizer.redactBody(body)}");
+    if (method != null) {
+      AppUtils.debug("method: $method");
+    }
+  }
+
+  static void _logResponse({
+    required Uri url,
+    required Response response,
+  }) {
+    AppUtils.debug("/****rest call response starts****/");
+    AppUtils.debug("url: $url");
+    AppUtils.debug("status code: ${response.statusCode}");
+    AppUtils.debug("rest response: ${response.body}");
   }
 }

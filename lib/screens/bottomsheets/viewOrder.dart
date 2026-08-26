@@ -1,3 +1,4 @@
+import 'package:smerp_go/core/logging/app_logger.dart';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -98,7 +99,7 @@ class _ViewOrderState extends State<ViewOrder> {
         setState(() {
           customersName =orderInformation!.buyer.name;
         });
-        print("user name is $customersName");
+        AppLogger.debug('Order view loaded ${orderInformation!.items.length} items', tag: 'Order');
         totalAmount = 0;
         for (var element in orderInformation!.items) {
           setState(() {
@@ -111,7 +112,7 @@ class _ViewOrderState extends State<ViewOrder> {
   void getReceipt()async{
     //isLoading.value= true;
     image = await getCustomerReceipt();
-    print("i cal");
+    AppLogger.debug('Order receipt image generated', tag: 'Order');
     setState(() {
       image = image;
       isLoading.value = false;
@@ -289,7 +290,7 @@ class _ViewOrderState extends State<ViewOrder> {
                             isLoading.value=true;
                             Future.delayed(Duration(seconds: 3)).whenComplete(() async {
                               isLoading.value=false;
-                              print("I am sharing");
+                              AppLogger.debug('Sharing order receipt', tag: 'Order');
                               //     Uint8List res=await   getCustomerReceipt();
                               if(image != null){
                                //getPdf("${customersName} receipt", image!);
@@ -597,7 +598,7 @@ class _ViewOrderState extends State<ViewOrder> {
                           isLoading.value=true;
                           Future.delayed(Duration(seconds: 3)).whenComplete(() async {
                             isLoading.value=false;
-                            print("I am sharing");
+                            AppLogger.debug('Sharing order receipt', tag: 'Order');
                             //     Uint8List res=await   getCustomerReceipt();
                             if(image != null){
                               //getPdf("${customersName} receipt", image!);

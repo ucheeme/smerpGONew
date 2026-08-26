@@ -8,6 +8,8 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:smerp_go/cubit/notificationCubit/notification_cubit.dart';
+import 'package:smerp_go/core/cache/app_list_cache.dart';
+import 'package:smerp_go/core/cache/app_list_cache_keys.dart';
 import 'package:smerp_go/screens/bottomsheets/viewOrder.dart';
 import 'package:smerp_go/utils/appColors.dart';
 import 'package:smerp_go/utils/appDesignUtil.dart';
@@ -39,13 +41,21 @@ class _NotificationAppState extends State<NotificationApp> {
   // notificationNumber.value;
     super.initState();
   }
+
+  @override
+  void dispose() {
+    refreshController2.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
   cubit = context.read<NotificationCubit>();
-  if(notificationListTemp.isEmpty){
-    cubit?.getNotificationList();
-  }else {
+  if(notificationListTemp.isNotEmpty &&
+      AppListCache.isFresh(AppListCacheKeys.notifications)){
     notificationList = notificationListTemp;
+  }else {
+    cubit?.getNotificationList();
   }
     return BlocBuilder<NotificationCubit, NotificationState>(
   builder: (context, state) {

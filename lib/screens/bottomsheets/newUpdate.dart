@@ -10,6 +10,7 @@ import 'package:smerp_go/model/response/defaultApiResponse.dart';
 import 'package:smerp_go/screens/bottomNav/screens/profile/personalData.dart';
 import 'package:smerp_go/screens/bottomNav/screens/profile/profileList.dart';
 import 'package:smerp_go/utils/appDesignUtil.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../apiServiceLayer/apiService.dart';
@@ -358,8 +359,13 @@ class NewDeviceSetUp extends StatelessWidget {
                         backgroundColor: Colors.red.withOpacity(0.5),
                         colorText: Colors.white,);
                     }
-                  }catch(e){
-                    print("$e");
+                  }catch(e, stackTrace){
+                    AppLogger.error(
+                      e,
+                      stackTrace,
+                      reason: 'register_new_device_failed',
+                      tag: 'Auth',
+                    );
                   }
                 }
               },

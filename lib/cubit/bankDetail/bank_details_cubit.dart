@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:smerp_go/Reposistory/catalogRepo.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
+import 'package:smerp_go/core/repositories/i_bank_details_repository.dart';
 
 import '../../model/request/bankDetails.dart';
 import '../../model/response/bankDetail.dart';
@@ -11,7 +12,7 @@ import '../../utils/AppUtils.dart';
 part 'bank_details_state.dart';
 BankDetailReponse? storeBankDetail ;
 class BankDetailsCubit extends Cubit<BankDetailsState> {
-  final CataloRepo bankDetailRepo;
+  final IBankDetailsRepository bankDetailRepo;
   BankDetailsCubit(this.bankDetailRepo) : super(BankDetailsInitial());
 
   void getBankDetail()async{
@@ -19,14 +20,13 @@ class BankDetailsCubit extends Cubit<BankDetailsState> {
       emit(BankDetailLoadingState());
       final response= await bankDetailRepo.getBankDetails();
       if(response is  BankDetailReponse){
-        print("I emitted");
         emit(BankDetailSuccessState(response));
       }else{
         emit(BankDetailErrorState(response as DefaultApiResponse));
-        print("The type is: ${response.runtimeType}");
+        AppLogger.warning('Unexpected bank detail response type=${response.runtimeType}', tag: 'BankDetailsCubit');
       }
-    }catch(e, strace){
-      print("faileeeed: $e and $strace");
+    }catch(e, stackTrace){
+      AppLogger.error(e, stackTrace, reason: 'getBankDetail', tag: 'BankDetailsCubit');
       emit(BankDetailErrorState(AppUtils.defaultErrorResponse()));
     }
   }
@@ -37,18 +37,16 @@ class BankDetailsCubit extends Cubit<BankDetailsState> {
       final response= await bankDetailRepo.createBankDetails(request);
       if(response is  DefaultApiResponse){
         if(response.isSuccess){
-          print("I emitted");
           emit(CreateBankDetailSuccessState(response));
         }else{
           emit(BankDetailErrorState(response));
-          print("The type is: ${response.runtimeType}");
         }
       }else{
         emit(BankDetailErrorState(response as DefaultApiResponse));
-        print("The type is: ${response.runtimeType}");
+        AppLogger.warning('Unexpected create bank detail response type=${response.runtimeType}', tag: 'BankDetailsCubit');
       }
-    }catch(e, strace){
-      print("faileeeed: $e and $strace");
+    }catch(e, stackTrace){
+      AppLogger.error(e, stackTrace, reason: 'createBankDetail', tag: 'BankDetailsCubit');
       emit(BankDetailErrorState(AppUtils.defaultErrorResponse()));
     }
   }

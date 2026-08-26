@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
+import 'package:smerp_go/core/session/session_manager.dart';
 import 'package:smerp_go/screens/authentication_signup/signInFlow/signin.dart';
 import 'package:smerp_go/screens/authentication_signup/signInFlow/signinViaPhoneEmail.dart';
 
@@ -16,6 +18,21 @@ class ApiRepository{
   setErrorResponse(DefaultApiResponse? value) {
     _errorResponse = value;
   }
+
+  void logRepoSuccess(String operation, {int? count}) {
+    AppLogger.debug(
+      count != null ? '$operation count=$count' : operation,
+      tag: 'Repo',
+    );
+  }
+
+  void logRepoFailure(String operation, Object response) {
+    final detail = response is DefaultApiResponse
+        ? response.message
+        : response.runtimeType.toString();
+    AppLogger.warning('$operation failed: $detail', tag: 'Repo');
+  }
+
   Object handleSuccessResponse(dynamic response){
     // if (response is DefaultApiResponse) {
     //   var r = response;//defaultApiResponseFromJson(response.response as String);
@@ -41,7 +58,7 @@ class ApiRepository{
         var data = defaultApiResponseFromJson(response.errorResponse as String);
        if(data.isSuccess==false){
           if(data.data==null||data.data.runtimeType == bool){
-            print(data.data.runtimeType);
+            AppLogger.debug('Error data type: ${data.data.runtimeType}', tag: 'API');
             Get.snackbar( data.message,
               "",
               backgroundColor: Colors.red.withOpacity(0.4),
@@ -51,7 +68,7 @@ class ApiRepository{
 
             );
           }else{
-            print(data.data.runtimeType);
+            AppLogger.debug('Error data type: ${data.data.runtimeType}', tag: 'API');
             Get.snackbar( data.message,
               "",
               backgroundColor: Colors.red.withOpacity(0.4),
@@ -77,9 +94,7 @@ class ApiRepository{
       }
       catch (e,trace) {
         isLoading.value= false;
-        print("error");
-        print(e);
-        print(trace);
+        AppLogger.error(e, trace, reason: 'handleErrorResponse', tag: 'API');
        setErrorResponse(AppUtils.defaultErrorResponse());
 
       }
@@ -103,31 +118,7 @@ class ApiRepository{
     }
     else if(response is TokenExpired){
 
-      // Get.snackbar("Authentication Expired",
-      //   TokenExpired(401, "Token Expired").message,
-      //   backgroundColor: Colors.red.withOpacity(0.5),
-      //   colorText: Colors.white,);
-      productCategoryList =[];
-      productUnitCategoryList =[];
-      inventoryListTemp =[];
-      catalogListTemp =[];
-      catalogsFTemp = [];
-      saleListTemp=[];
-      actionBy = "";
-      inventoryId="";
-      isLoading.value=false;
-      isSignUpViaPhone.value =true;
-      userIdentityValue=null;
-      identitySource = null;
-      otpCreateAccout= "";
-      loginData=null;
-      isProductCategoryHasRun = Rx(false);
-      isProductUnitCategoryHasRun = Rx(false);
-      isInventoryListHasRun =false;
-      isSalesListHasRun = Rx(false);
-      isCatalogListHasRun = Rx(false);
-      saleIsEmpty= RxBool(false);
-      productIsEmpty= RxBool(false);
+      await SessionManager.clearSession();
       Get.offAll(SignIn(),
       transition: Transition.cupertino,
       duration: Duration(seconds: 1)
@@ -136,22 +127,14 @@ class ApiRepository{
       TokenExpired(401, "Token Expired, please sign in").message));
     }
     else if(response is ForbiddenAccess){
-      try {
-        var data = defaultApiResponseFromJson(
-            await  response.response.toString() );
-        Get.off(SignIn(),
-            transition: Transition.cupertino,
-            duration: Duration(seconds: 1)
-        );
-      }
-      catch (e,trace) {
-        isLoading.value= false;
-        print("error");
-        print(e);
-        print(trace);
-        setErrorResponse(AppUtils.defaultErrorResponse());
-      }
-
+      await SessionManager.clearSession();
+      Get.off(SignIn(),
+          transition: Transition.cupertino,
+          duration: Duration(seconds: 1)
+      );
+      setErrorResponse(AppUtils.defaultErrorResponse(
+        msg: 'Access forbidden. Please sign in again.',
+      ));
     }
   }
 }

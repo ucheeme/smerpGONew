@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:smerp_go/screens/bottomsheets/paymentStatus.dart' as pStatus;
 
+import 'package:smerp_go/core/logging/app_logger.dart';
 import '../../../../controller/addSaleController.dart';
 import '../../../../model/response/inventoryList.dart';
 import '../../../../model/response/sales/saleListInfo.dart';
@@ -44,8 +45,7 @@ class _AddEditSaleItemState extends State<AddEditSaleItem> {
     prodName = widget.salesItemInfo!.productName;
     editProductItemQuantity.text = widget.salesItemInfo!.quantity.toString();
     super.initState();
-    print(paymentStatus);
-    print(prodName);
+    AppLogger.debug('Edit sale item initialized', tag: 'Sale');
     _focusNode = FocusNode();
     _focusNode?.addListener(_onFocusChange);
   }
@@ -102,7 +102,6 @@ class _AddEditSaleItemState extends State<AddEditSaleItem> {
                                 //textInputBorder(_controller),
                                 GestureDetector(
                                   onTap: () async {
-                                    print("oooo");
                                     // InventoryInfo response =
                                     // await Get.bottomSheet(AllProduct());
                                     // if (response != null) {

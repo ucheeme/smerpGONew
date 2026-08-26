@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:overlay_loader_with_app_icon/overlay_loader_with_app_icon.dart';
+import 'package:smerp_go/core/logging/app_logger.dart';
 import 'package:smerp_go/controller/signInController.dart';
 import 'package:smerp_go/screens/authentication_signup/signInFlow/signinViaPhoneEmail.dart';
 import 'package:smerp_go/screens/authentication_signup/signUpFlow/signup.dart';
@@ -13,7 +14,6 @@ import 'package:smerp_go/utils/UserUtils.dart';
 import 'package:smerp_go/utils/appColors.dart';
 import 'package:smerp_go/utils/appDesignUtil.dart';
 
-import '../../../controller/controllererer.dart';
 import '../../../utils/custom_keypad.dart';
 
 class SignIn extends StatefulWidget {
@@ -25,13 +25,11 @@ class SignIn extends StatefulWidget {
 
 class _SignInState extends State<SignIn> {
   SignInController _controller = Get.put(SignInController());
- //NewControl _beontroller = Get.put(NewControl());
   var pinValueController2= TextEditingController();
 
   @override
   void initState() {
-    print(userImage.value);
-    print("I am initialized");
+    AppLogger.debug('SignIn screen initialized', tag: 'SignIn');
     super.initState();
   }
 
