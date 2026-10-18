@@ -19,6 +19,29 @@ void main() {
       expect(contents, isNot(contains('compileSdkVersion 35')));
       expect(contents, isNot(contains('targetSdkVersion 35')));
     });
+
+    test('app build.gradle is configured for 16 KB page size compliance', () {
+      final buildGradle = File('android/app/build.gradle');
+      final rootGradle = File('android/build.gradle');
+      final settingsGradle = File('android/settings.gradle.kts');
+      final checkScript = File('android/scripts/check_elf_alignment.sh');
+
+      expect(buildGradle.existsSync(), isTrue);
+      expect(rootGradle.existsSync(), isTrue);
+      expect(settingsGradle.existsSync(), isTrue);
+      expect(checkScript.existsSync(), isTrue);
+
+      final appGradle = buildGradle.readAsStringSync();
+      final rootContents = rootGradle.readAsStringSync();
+      final settingsContents = settingsGradle.readAsStringSync();
+
+      expect(appGradle, contains('ndkVersion'));
+      expect(appGradle, contains('28.2.13676358'));
+      expect(appGradle, contains('useLegacyPackaging false'));
+      expect(appGradle, isNot(contains('ANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES')));
+      expect(rootContents, contains('com.android.tools.build:gradle:9.'));
+      expect(settingsContents, contains('com.android.application") version "9.'));
+    });
   });
 
   group('SensitiveLogSanitizer', () {

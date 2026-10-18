@@ -1,12 +1,12 @@
 buildscript {
-    ext.kotlin_version = '1.9.0'
+    ext.kotlin_version = '2.2.10'
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.13.2'
+        classpath 'com.android.tools.build:gradle:9.3.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.google.gms:google-services:4.4.0'
     }
@@ -27,15 +27,15 @@ subprojects {
     project.plugins.withId("com.android.library") {
         if (project.extensions.findByName("androidComponents") != null) {
             project.androidComponents.finalizeDsl { dsl ->
-                if (dsl.compileSdk == null || dsl.compileSdk < 34) {
-                    dsl.compileSdk = 34
+                if (dsl.compileSdk == null || dsl.compileSdk < 36) {
+                    dsl.compileSdk = 36
                 }
             }
         } else {
             project.afterEvaluate { p ->
                 if (p.hasProperty("android")) {
-                    if (p.android.compileSdk == null || p.android.compileSdk < 34) {
-                        p.android.compileSdk = 34
+                    if (p.android.compileSdk == null || p.android.compileSdk < 36) {
+                        p.android.compileSdk = 36
                     }
                 }
             }

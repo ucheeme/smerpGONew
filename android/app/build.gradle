@@ -24,7 +24,8 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace 'com.fifthlab.smerp_go'
-    ndkVersion ="27.0.12077973"
+    // NDK r28+ compiles native libs with 16 KB ELF alignment by default (Play requirement).
+    ndkVersion = "28.2.13676358"
     compileSdkVersion 36
 
     compileOptions {
@@ -49,6 +50,19 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
+
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
+            }
+        }
+    }
+
+    // AGP 8.5.1+ keeps JNI libs uncompressed and zip-aligns them on 16 KB boundaries.
+    packaging {
+        jniLibs {
+            useLegacyPackaging false
+        }
     }
 
     signingConfigs {
